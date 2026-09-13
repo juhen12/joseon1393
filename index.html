@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#172019">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>조선 1393 · 대체역사 시뮬레이터 V12</title>
+<title>조선 1393 · 대체역사 시뮬레이터 V12.1</title>
 <style>
 :root{
   --bg:#101712;
@@ -141,7 +141,7 @@ button{cursor:pointer}
 .choice:hover{transform:translateY(-1px);border-color:#98855a;background:#faf4e6}
 
 .sidePanel{padding:14px;min-height:420px}
-.sideTabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px}
+.sideTabs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:12px}
 .sideTab{border:0;border-radius:10px;padding:9px 6px;background:#e7dfcc;color:#655e50;font-size:12px}
 .sideTab.active{background:#283a2d;color:white}
 .cardTitle{font-size:13px;font-weight:800;margin:3px 0 8px}
@@ -233,6 +233,9 @@ th{font-weight:700;color:#766f61}
   margin-bottom:10px
 }
 .diplomacyGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.sidePanel .diplomacyGrid{grid-template-columns:1fr}
+.sidePanel .dipActions{gap:5px}
+.sidePanel .dipBtn{padding:7px 8px}
 .dipCard{
   border:1px solid #d7c9aa;background:#f8f2e5;border-radius:14px;padding:12px;color:#292b25
 }
@@ -462,6 +465,7 @@ th{font-weight:700;color:#766f61}
         <button class="sideTab" data-side="characters">인물</button>
         <button class="sideTab" data-side="foreign">외교</button>
         <button class="sideTab" data-side="military">군사</button>
+        <button class="sideTab" data-side="decisions">결정</button>
         <button class="sideTab" data-side="chronicle">실록</button>
       </div>
       <div id="sideContent"></div>
@@ -3103,10 +3107,14 @@ function renderSide(){
     el.innerHTML=`<div class="report"><b>${headOfStateText(state)}</b><br><span class="small">${state.dynasty.stateName||"조선"} · ${isRepublic(state)?state.dynasty.governmentName:`재위 시작 ${state.dynasty.reignStart}년 · 후계 ${state.dynasty.heir||"미정"}`}${state.dynasty.eraName?` · 연호 ${state.dynasty.eraName}`:""}${state.dynasty.statePath?` · ${STATE_PATH_INFO[state.dynasty.statePath].name}`:""}</span></div>`+
     Object.entries(state.characters).filter(([,c])=>c.alive).slice(0,8).map(([n,c])=>`<div class="charCard"><div class="charTop"><b>${n}</b><span class="small">${c.role||""}</span></div><div class="small">영향력 ${Math.round(c.influence)} · 충성 ${Math.round(c.loyalty)} · 야심 ${Math.round(c.ambition)}</div><div class="bar"><i style="width:${c.influence}%"></i></div></div>`).join("");
   }else if(sideTab==="foreign"){
-    el.innerHTML=`<div class="cardTitle">주변국</div>`+Object.entries(state.factions).map(([n,f])=>`<div class="foreignCard"><div class="charTop"><b>${n}</b><span class="small">${relationText(f.relation)}</span></div><div class="small">긴장 ${tensionText(f.tension)} · 세력 ${Math.round(f.power)}</div></div>`).join("")+
-      `<div class="cardTitle" style="margin-top:10px">최근 보고</div>`+(state.foreign_actions.slice(-4).reverse().map(x=>`<div class="report">• ${x}</div>`).join("")||`<div class="small">특별한 보고 없음</div>`);
+    el.innerHTML=diplomacyHTML();
+    bindDiplomacyButtons(el);
   }else if(sideTab==="military"){
     el.innerHTML=militaryHTML();bindMilitaryButtons(el);
+  }else if(sideTab==="decisions"){
+    el.innerHTML=strategicDecisionsHTML();
+    bindStrategicDecisionButtons(el);
+    bindFiscalButtons(el);
   }else{
     el.innerHTML=state.chronicle.length?state.chronicle.slice(-12).reverse().map(e=>`<div class="chronicle"><h4>${e.year}년 ${e.season} · ${e.ruler}</h4><p>${e.event} — ${e.choice}</p><span class="small">${e.result}</span></div>`).join(""):`<div class="small">아직 기록 없음</div>`;
   }

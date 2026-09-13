@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#172019">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>조선 1393 · 대체역사 시뮬레이터 V7</title>
+<title>조선 1393 · 대체역사 시뮬레이터 V8</title>
 <style>
 :root{
   --bg:#101712;
@@ -227,6 +227,51 @@ th{font-weight:700;color:#766f61}
 .decisionBtn.primary{background:#304537;color:#fff;border-color:#304537}
 .decisionBtn.danger{background:#873832;color:#fff;border-color:#873832}
 .decisionBtn:disabled{opacity:.42;cursor:not-allowed}
+
+.diplomacyHeader{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:12px;
+  margin-bottom:10px
+}
+.diplomacyGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.dipCard{
+  border:1px solid #d7c9aa;background:#f8f2e5;border-radius:14px;padding:12px;color:#292b25
+}
+.dipCard h3{margin:0;font-size:15px}
+.dipMeta{font-size:11px;color:#746d60;line-height:1.55;margin-top:4px}
+.dipActions{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px}
+.dipBtn{
+  border:1px solid #a89569;background:#fffdf8;color:#302e27;border-radius:9px;
+  padding:7px 9px;font-size:11px;font-weight:750
+}
+.dipBtn.primary{background:#324a38;color:#fff;border-color:#324a38}
+.dipBtn.danger{background:#8f3b35;color:#fff;border-color:#8f3b35}
+.dipBtn:disabled{opacity:.38}
+.relationBar{height:6px;background:#ded5c3;border-radius:99px;overflow:hidden;margin-top:8px}
+.relationBar i{display:block;height:100%;background:#71816f}
+
+.moreTabs{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:11px}
+.moreTab{border:0;border-radius:10px;padding:9px 6px;background:#e6decb;color:#5f594c;font-size:12px}
+.moreTab.active{background:#2f4635;color:#fff}
+
+.strategyGroup{margin-bottom:14px}
+.strategyGroupTitle{font-size:12px;font-weight:900;color:#564d3d;margin-bottom:7px}
+.strategicCard{
+  border:1px solid #d7c8a5;background:#fbf7eb;border-radius:14px;padding:12px;margin-bottom:8px
+}
+.strategicCard.locked{opacity:.62;background:#eee8da}
+.strategicCard h3{margin:0;font-size:14px}
+.strategicCard p{font-size:11px;color:#726a5d;line-height:1.55;margin:5px 0 0}
+.progressRow{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#756d61;margin-top:7px}
+
+.militaryTopGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.milStat{background:#f5eedf;border:1px solid #d6c8aa;border-radius:12px;padding:10px}
+.milStat span{display:block;font-size:10px;color:#756e60}
+.milStat b{font-size:18px}
+
+@media(max-width:900px){
+  .diplomacyGrid{grid-template-columns:1fr}
+  .militaryTopGrid{grid-template-columns:repeat(3,1fr)}
+}
 .warPanel{
   border:1px solid #c99b8f;background:#fff2ed;border-radius:14px;padding:12px;margin-bottom:12px
 }
@@ -282,7 +327,7 @@ th{font-weight:700;color:#766f61}
   .provinceCard h4{margin:0 0 5px;font-size:14px}
   .provinceCard div{font-size:11px;color:#746c5e;line-height:1.6}
   .bottomNav{
-    display:grid;grid-template-columns:repeat(6,1fr);position:fixed;left:0;right:0;bottom:0;
+    display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;
     padding:7px max(8px,env(safe-area-inset-left)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-right));
     background:rgba(12,18,13,.94);backdrop-filter:blur(15px);border-top:1px solid rgba(255,255,255,.10);z-index:25
   }
@@ -350,7 +395,7 @@ th{font-weight:700;color:#766f61}
         <button class="sideTab active" data-side="provinces">8도</button>
         <button class="sideTab" data-side="characters">인물</button>
         <button class="sideTab" data-side="foreign">외교</button>
-        <button class="sideTab" data-side="decisions">결정</button>
+        <button class="sideTab" data-side="military">군사</button>
         <button class="sideTab" data-side="chronicle">실록</button>
       </div>
       <div id="sideContent"></div>
@@ -381,36 +426,45 @@ th{font-weight:700;color:#766f61}
       </article>
     </div>
 
-    <div id="screen-people" class="mobileScreen">
-      <article class="mobilePaper">
-        <div class="sectionLabel">조정 인물</div>
-        <h2 class="eventTitle" style="font-size:22px">왕실과 대신</h2>
-        <div id="mStatePaths" class="pathGrid"></div>
-        <div id="mCharacters"></div>
-      </article>
-    </div>
-
     <div id="screen-foreign" class="mobileScreen">
       <article class="mobilePaper">
-        <div class="sectionLabel">천하 정세</div>
-        <h2 class="eventTitle" style="font-size:22px">외교와 주변국</h2>
+        <div class="sectionLabel">외교</div>
+        <h2 class="eventTitle" style="font-size:22px">주변국과 외교 행동</h2>
         <div id="mForeign"></div>
       </article>
     </div>
 
-    <div id="screen-decisions" class="mobileScreen">
+    <div id="screen-military" class="mobileScreen">
       <article class="mobilePaper">
-        <div class="sectionLabel">국가 결정</div>
-        <h2 class="eventTitle" style="font-size:22px">전쟁과 국가 전략</h2>
-        <div id="mDecisions"></div>
+        <div class="sectionLabel">군사</div>
+        <h2 class="eventTitle" style="font-size:22px">전쟁과 군사 작전</h2>
+        <div id="mMilitary"></div>
       </article>
     </div>
 
-    <div id="screen-chronicle" class="mobileScreen">
+    <div id="screen-more" class="mobileScreen">
       <article class="mobilePaper">
-        <div class="sectionLabel">플레이 기록</div>
-        <h2 class="eventTitle" style="font-size:22px">조선왕조실록</h2>
-        <div id="mChronicle"></div>
+        <div class="moreTabs">
+          <button class="moreTab active" data-more="decisions">국가 결정</button>
+          <button class="moreTab" data-more="people">인물</button>
+          <button class="moreTab" data-more="chronicle">실록</button>
+        </div>
+        <div id="more-decisions" class="morePane">
+          <div class="sectionLabel">국가 결정</div>
+          <h2 class="eventTitle" style="font-size:22px">국체와 국가 프로젝트</h2>
+          <div id="mDecisions"></div>
+        </div>
+        <div id="more-people" class="morePane" style="display:none">
+          <div class="sectionLabel">조정 인물</div>
+          <h2 class="eventTitle" style="font-size:22px">왕실과 대신</h2>
+          <div id="mStatePaths" class="pathGrid"></div>
+          <div id="mCharacters"></div>
+        </div>
+        <div id="more-chronicle" class="morePane" style="display:none">
+          <div class="sectionLabel">플레이 기록</div>
+          <h2 class="eventTitle" style="font-size:22px">조선왕조실록</h2>
+          <div id="mChronicle"></div>
+        </div>
       </article>
     </div>
   </section>
@@ -424,10 +478,9 @@ th{font-weight:700;color:#766f61}
 <nav class="bottomNav">
   <button class="navBtn active" data-screen="court"><span>🏯</span>조정</button>
   <button class="navBtn" data-screen="map"><span>🗺️</span>전국</button>
-  <button class="navBtn" data-screen="people"><span>👥</span>인물</button>
   <button class="navBtn" data-screen="foreign"><span>🌏</span>외교</button>
-  <button class="navBtn" data-screen="decisions"><span>⚔️</span>결정</button>
-  <button class="navBtn" data-screen="chronicle"><span>📜</span>실록</button>
+  <button class="navBtn" data-screen="military"><span>⚔️</span>군사</button>
+  <button class="navBtn" data-screen="more"><span>☰</span>더보기</button>
 </nav>
 
 <div id="toast" class="toast"></div>
@@ -480,7 +533,7 @@ function newGame(){
     "함길":{population:510000,tax:34,public_support:53,security:45,agriculture:39,military:67,development:34}
   };
   const s={
-    version:7,seed:Math.floor(Math.random()*900000000)+1,turn:0,date:{year:1393,season:"봄"},
+    version:8,seed:Math.floor(Math.random()*900000000)+1,turn:0,date:{year:1393,season:"봄"},
     dynasty:{ruler:"태조 이성계",reignStart:1392,heir:"이방석",line:"founding",prestige:62,stateName:"조선",sovereignTitle:"왕",eraName:"",imperial:false,statePath:"",statePathLevel:0,regime:"monarchy",governmentName:"왕정",successionCount:0},
     joseon:{population:0,national_power:46,treasury:54,military:57,royal_authority:58,public_support:60,administration:47,technology:32,diplomacy:43,food:58,stability:61,corruption:39,commerce:26,navy:42,health:44,culture:38},
     provinces,
@@ -509,6 +562,8 @@ function newGame(){
       turns:0,stance:"balanced",actionUsedTurn:-1,prep:null,lastReport:"",history:[]
     },
     crisis:{rebellionStage:0,revoltStrength:0,republicanMomentum:0,lastRevoltYear:0},
+    diplomacyState:{cooldowns:{},lastAction:"",lastActionTurn:-1},
+    strategicDecisions:{projects:{},completed:[]},
     recentCategories:[],recentIds:[],fired:[],chronicle:[],foreign_actions:[],chains:{},
     last_result:"",current_event:null,game_over:false,game_over_reason:""
   };
@@ -1144,9 +1199,14 @@ function warEvents(s,rng){
     ],["해전"])});
   return out;
 }
-function decisionHTML(){
+function militaryHTML(){
   const w=state.war;
-  let h=`<div class="decisionIntro">랜덤 사건과 별개로 언제든 실행할 수 있는 국가 행동입니다. 현재 체제는 <b>${state.dynasty.regime==="republic"?"공화정":"군주정"}</b>이며, 전쟁은 <b>준비 → 선전포고 → 전쟁 수행 → 강화</b> 순서로 진행됩니다.</div>`;
+  let h=`<div class="militaryTopGrid">
+    <div class="milStat"><span>군사력</span><b>${Math.round(state.joseon.military)}</b></div>
+    <div class="milStat"><span>수군</span><b>${Math.round(state.joseon.navy)}</b></div>
+    <div class="milStat"><span>전쟁준비도</span><b>${Math.round(state.war.readiness)}</b></div>
+  </div>
+  <div class="decisionIntro">전쟁은 이 화면에서 직접 관리합니다. <b>준비 → 선전포고 → 작전 → 강화협상</b>을 기다림 없이 진행할 수 있습니다.</div>`;
   if(w.active){
     const ours=warStrength(state),enemy=enemyStrength(state);
     h+=`<div class="warPanel"><div class="sectionLabel">진행 중인 전쟁</div><h3>${WAR_PLANS[w.planKey]?.name||w.target}</h3>
@@ -1165,16 +1225,16 @@ function decisionHTML(){
       </div></div>`;
   }else if(w.prep){
     const p=WAR_PLANS[w.prep.key];
-    h+=`<div class="warPanel"><div class="sectionLabel">외교적 전쟁 준비</div><h3>${p.name}</h3>
+    h+=`<div class="warPanel"><div class="sectionLabel">전쟁 준비</div><h3>${p.name}</h3>
       <div class="decisionDesc">${p.desc}</div>
       <div class="warScoreTrack"><div class="warScoreFill" style="width:${(w.prep.progress/w.prep.needed)*100}%"></div></div>
-      <div class="small" style="margin-top:7px">준비 ${w.prep.progress}/${w.prep.needed}턴 ${w.prep.ready?"· 명분과 동원계획 준비 완료":""}</div>
+      <div class="small" style="margin-top:7px">준비 ${w.prep.progress}/${w.prep.needed}턴 ${w.prep.ready?"· 선전포고 가능":""}</div>
       <div class="decisionActions">
         ${w.prep.ready?`<button class="decisionBtn danger" data-declarewar="1">선전포고</button>`:""}
         <button class="decisionBtn" data-cancelwar="1">준비 중단</button>
       </div></div>`;
   }
-  h+=`<div class="decisionSection">전쟁 결정</div>`;
+  h+=`<div class="decisionSection">전쟁 계획</div>`;
   for(const [key,p] of Object.entries(WAR_PLANS)){
     const reqs=p.reqs(state),ok=reqs.every(x=>x[0]),blocked=w.active||!!w.prep;
     const riskClass=p.risk==="극단적"?"extreme":p.risk==="높음"?"high":"";
@@ -1183,17 +1243,17 @@ function decisionHTML(){
       <div class="decisionDesc">${p.desc}<br>전쟁 목표: ${p.goal}</div>
       <div class="reqList">${reqs.map(([pass,label])=>`<span class="req ${pass?"ok":"no"}">${pass?"✓":"✕"} ${label}</span>`).join("")}</div>
       <div class="decisionActions"><button class="decisionBtn primary" data-warprep="${key}" ${!ok||blocked?"disabled":""}>전쟁 준비 시작</button>
-      <span class="small">비용: 재정 ${p.cost.treasury} · 외교 ${p.cost.diplomacy} · 준비 ${p.prepTurns}턴</span></div>
+      <span class="small">재정 ${p.cost.treasury} · 외교 ${p.cost.diplomacy} · 준비 ${p.prepTurns}턴</span></div>
     </div>`;
   }
-  h+=`<div class="decisionSection">상시 국가 결정</div>
-    <div class="decisionCard"><div class="decisionName">군량 비축</div><div class="decisionDesc">전쟁에 대비해 식량과 군수품을 미리 확보한다.</div>
+  h+=`<div class="decisionSection">군사 상시 행동</div>
+    <div class="decisionCard"><div class="decisionName">군량 비축</div><div class="decisionDesc">식량과 군수품을 비축한다.</div>
       <div class="decisionActions"><button class="decisionBtn" data-nationaldecision="stockpile" ${state.joseon.treasury<6?"disabled":""}>재정 6 사용</button></div></div>
-    <div class="decisionCard"><div class="decisionName">군사 훈련 강화</div><div class="decisionDesc">즉시 전쟁 준비도를 높이지만 국고가 소모된다.</div>
+    <div class="decisionCard"><div class="decisionName">군사 훈련 강화</div><div class="decisionDesc">군사력과 전쟁 준비도를 높인다.</div>
       <div class="decisionActions"><button class="decisionBtn" data-nationaldecision="drill" ${state.joseon.treasury<5?"disabled":""}>훈련 실시</button></div></div>`;
   return h;
 }
-function bindDecisionButtons(root=document){
+function bindMilitaryButtons(root=document){
   root.querySelectorAll("[data-warprep]").forEach(b=>b.onclick=()=>startWarPrep(b.dataset.warprep));
   root.querySelectorAll("[data-cancelwar]").forEach(b=>b.onclick=cancelWarPrep);
   root.querySelectorAll("[data-declarewar]").forEach(b=>b.onclick=declarePreparedWar);
@@ -1211,10 +1271,10 @@ function bindDecisionButtons(root=document){
     recompute(state);persist();render();
   });
 }
-function renderDecisions(){
-  const m=document.querySelector("#mDecisions"); if(m){m.innerHTML=decisionHTML();bindDecisionButtons(m)}
-  if(sideTab==="decisions"){
-    const s=document.querySelector("#sideContent");if(s){s.innerHTML=decisionHTML();bindDecisionButtons(s)}
+function renderMilitary(){
+  const m=document.querySelector("#mMilitary"); if(m){m.innerHTML=militaryHTML();bindMilitaryButtons(m)}
+  if(sideTab==="military"){
+    const s=document.querySelector("#sideContent");if(s){s.innerHTML=militaryHTML();bindMilitaryButtons(s)}
   }
 }
 function renderWarHud(){
@@ -1438,6 +1498,187 @@ function statePathEvents(s){
   return out;
 }
 
+
+/* ===== 국가 결정 시스템 ===== */
+const STRATEGIC_DECISIONS={
+  capital:{
+    group:"국가 기반",name:"한양 천도",risk:"보통",
+    desc:"새 왕조의 중심을 개경에서 한양으로 옮긴다. 천도는 수년간의 준비와 재정 지출을 요구한다.",
+    requirements:s=>[
+      [s.flags.capital!=="한양","수도가 아직 한양이 아님"],
+      [s.date.year>=1393,"1393년 이후"],
+      [s.joseon.treasury>=35,"재정 35 이상"]
+    ],
+    turns:4,cost:8,
+    complete:s=>{
+      s.flags.capital="한양";
+      s.joseon.royal_authority=clamp(s.joseon.royal_authority+6);
+      s.joseon.administration=clamp(s.joseon.administration+4);
+      s.provinces["경기"].development=clamp(s.provinces["경기"].development+7);
+      s.joseon.public_support=clamp(s.joseon.public_support-2);
+      s.flags.hanyang_done=true;s.flags.capital_policy="decision";
+    }
+  },
+  private_army:{
+    group:"국가 기반",name:"사병 혁파",risk:"높음",
+    desc:"왕족과 공신이 보유한 사병을 중앙군으로 흡수해 군권을 국왕에게 집중한다.",
+    requirements:s=>[
+      [s.dynasty.regime!=="republic","군주정"],
+      [s.date.year>=1396,"1396년 이후"],
+      [!s.flags.private_army_reformed,"미완료"],
+      [s.joseon.royal_authority>=55,"왕권 55 이상"]
+    ],
+    turns:2,cost:4,
+    complete:s=>{
+      s.flags.private_army_reformed=true;
+      s.joseon.royal_authority=clamp(s.joseon.royal_authority+8);
+      s.joseon.military=clamp(s.joseon.military+5);
+      s.joseon.stability=clamp(s.joseon.stability-2);
+      s.pathScores.royal+=5;
+    }
+  },
+  census:{
+    group:"국가 기반",name:"전국 호적·토지조사",risk:"보통",
+    desc:"전국 인구와 토지 장부를 다시 작성해 조세와 군역의 기반을 정비한다.",
+    requirements:s=>[
+      [s.date.year>=1395,"1395년 이후"],
+      [!s.flags.census_reformed,"미완료"],
+      [s.joseon.administration>=45,"행정력 45 이상"]
+    ],
+    turns:3,cost:5,
+    complete:s=>{
+      s.flags.census_reformed=true;
+      s.joseon.administration=clamp(s.joseon.administration+7);
+      s.joseon.treasury=clamp(s.joseon.treasury+5);
+      s.joseon.corruption=clamp(s.joseon.corruption-5);
+      s.joseon.public_support=clamp(s.joseon.public_support-2);
+    }
+  },
+  proclaim_empire:{
+    group:"국체·왕실",name:"칭제건원",risk:"극단적",
+    desc:"왕을 황제로 높이고 독자 연호를 선포한다. 국호를 ‘대한국’으로 바꾸거나 ‘조선’을 유지할 수 있다.",
+    requirements:s=>[
+      [s.dynasty.regime!=="republic","군주정"],
+      [!s.dynasty.imperial,"아직 황제국이 아님"],
+      [s.date.year>=1400,"1400년 이후"],
+      [s.joseon.national_power>=64,"국력 64 이상"],
+      [s.joseon.royal_authority>=63,"왕권 63 이상"],
+      [s.joseon.stability>=55,"안정도 55 이상"],
+      [s.joseon.military>=58,"군사력 58 이상"]
+    ],
+    turns:2,cost:6,special:"imperial"
+  },
+  limited_monarchy:{
+    group:"국체·왕실",name:"제한군주정 개혁",risk:"높음",
+    desc:"왕실은 존속시키되 의정부와 각 도 대표가 국정에 정식으로 참여하도록 권력을 나눈다.",
+    requirements:s=>[
+      [s.dynasty.regime==="monarchy","군주정"],
+      [!s.flags.limited_monarchy,"아직 제한군주정이 아님"],
+      [s.joseon.administration>=58,"행정력 58 이상"],
+      [s.joseon.public_support>=45,"민심 45 이상"],
+      [s.pathScores.council>=10,"재상·합의정치 성향 10 이상"]
+    ],
+    turns:3,cost:4,
+    complete:s=>{
+      s.flags.limited_monarchy=true;
+      s.dynasty.governmentName="제한군주정";
+      s.joseon.royal_authority=clamp(s.joseon.royal_authority-10);
+      s.joseon.administration=clamp(s.joseon.administration+7);
+      s.joseon.public_support=clamp(s.joseon.public_support+6);
+      s.joseon.stability=clamp(s.joseon.stability+4);
+    }
+  }
+};
+function decisionReqsMet(def,s){return def.requirements(s).every(([ok])=>ok)}
+function projectFor(key){return state.strategicDecisions.projects[key]||null}
+function beginStrategicDecision(key){
+  const d=STRATEGIC_DECISIONS[key];if(!d||projectFor(key)||state.strategicDecisions.completed.includes(key))return;
+  if(!decisionReqsMet(d,state)||state.joseon.treasury<d.cost)return;
+  state.joseon.treasury=clamp(state.joseon.treasury-d.cost);
+  state.strategicDecisions.projects[key]={progress:0,needed:d.turns,status:"active"};
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"국가 결정",choice:`${d.name} 착수`,result:`${d.turns}턴 프로젝트`,ruler:headOfStateText(state),category:"결정"});
+  persist();render();toast(`${d.name} 추진을 시작했습니다.`);
+}
+function cancelStrategicDecision(key){
+  if(!projectFor(key))return;
+  delete state.strategicDecisions.projects[key];
+  persist();render();
+}
+function advanceStrategicDecisions(s){
+  for(const [key,p] of Object.entries(s.strategicDecisions.projects||{})){
+    if(p.status!=="active")continue;
+    p.progress++;
+    if(p.progress>=p.needed){
+      p.progress=p.needed;p.status="ready";
+      s.foreign_actions.push(`국가 결정 ‘${STRATEGIC_DECISIONS[key].name}’의 준비가 완료되었다.`);
+    }
+  }
+}
+function completeStrategicDecision(key,variant=null){
+  const d=STRATEGIC_DECISIONS[key],p=projectFor(key);if(!d||!p||p.status!=="ready")return;
+  if(d.special==="imperial"){
+    if(variant==="korea"){
+      state.dynasty.imperial=true;state.dynasty.sovereignTitle="황제";state.dynasty.stateName="대한국";
+      state.joseon.royal_authority=clamp(state.joseon.royal_authority+10);
+      state.joseon.public_support=clamp(state.joseon.public_support+5);
+      state.joseon.culture=clamp(state.joseon.culture+7);
+      state.factions["명"].relation=clamp(state.factions["명"].relation-24);
+      state.factions["명"].tension=clamp(state.factions["명"].tension+28);
+      state.flags.need_era=true;state.flags.imperial_rites_pending=true;
+    }else if(variant==="joseon"){
+      state.dynasty.imperial=true;state.dynasty.sovereignTitle="황제";state.dynasty.stateName="조선";
+      state.joseon.royal_authority=clamp(state.joseon.royal_authority+9);
+      state.joseon.public_support=clamp(state.joseon.public_support+3);
+      state.joseon.culture=clamp(state.joseon.culture+5);
+      state.factions["명"].relation=clamp(state.factions["명"].relation-20);
+      state.factions["명"].tension=clamp(state.factions["명"].tension+24);
+      state.flags.need_era=true;state.flags.imperial_rites_pending=true;
+    }else if(variant==="cancel"){
+      state.joseon.stability=clamp(state.joseon.stability+3);
+      state.joseon.diplomacy=clamp(state.joseon.diplomacy+3);
+    }else return;
+  }else if(d.complete)d.complete(state);
+  delete state.strategicDecisions.projects[key];
+  if(!state.strategicDecisions.completed.includes(key))state.strategicDecisions.completed.push(key);
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"국가 결정 완료",choice:d.name,result:variant||"완료",ruler:headOfStateText(state),category:"결정"});
+  recompute(state);persist();render();toast(`${d.name} 완료`);
+}
+function strategicDecisionsHTML(){
+  const groups=[...new Set(Object.values(STRATEGIC_DECISIONS).map(x=>x.group))];
+  let h=`<div class="decisionIntro">랜덤 사건이 아니라 <b>플레이어가 직접 추진하는 장기 국가 프로젝트</b>입니다. 조건을 충족하면 언제든 시작할 수 있습니다.</div>`;
+  for(const group of groups){
+    h+=`<div class="strategyGroup"><div class="strategyGroupTitle">${group}</div>`;
+    for(const [key,d] of Object.entries(STRATEGIC_DECISIONS).filter(([,x])=>x.group===group)){
+      const p=projectFor(key),done=state.strategicDecisions.completed.includes(key),reqs=d.requirements(state),ok=reqs.every(x=>x[0]);
+      const riskClass=d.risk==="극단적"?"extreme":d.risk==="높음"?"high":"";
+      h+=`<div class="strategicCard ${(!ok&&!p)||done?"locked":""}">
+        <div class="decisionTop"><h3>${d.name}</h3><span class="decisionRisk ${riskClass}">${done?"완료":`위험 ${d.risk}`}</span></div>
+        <p>${d.desc}</p>
+        ${!done?`<div class="reqList">${reqs.map(([pass,label])=>`<span class="req ${pass?"ok":"no"}">${pass?"✓":"✕"} ${label}</span>`).join("")}</div>`:""}
+        ${p?`<div class="progressRow"><span>${p.status==="ready"?"준비 완료":`진행 ${p.progress}/${p.needed}턴`}</span><span>${Math.round(p.progress/p.needed*100)}%</span></div>
+          <div class="warScoreTrack"><div class="warScoreFill" style="width:${Math.min(100,p.progress/p.needed*100)}%"></div></div>`:""}
+        <div class="decisionActions">
+          ${!done&&!p?`<button class="decisionBtn primary" data-strategy-start="${key}" ${!ok||state.joseon.treasury<d.cost?"disabled":""}>추진 시작</button><span class="small">재정 ${d.cost} · ${d.turns}턴</span>`:""}
+          ${p&&p.status==="active"?`<button class="decisionBtn" data-strategy-cancel="${key}">중단</button>`:""}
+          ${p&&p.status==="ready"&&d.special!=="imperial"?`<button class="decisionBtn primary" data-strategy-complete="${key}">최종 재가</button>`:""}
+          ${p&&p.status==="ready"&&d.special==="imperial"?`
+            <button class="decisionBtn danger" data-imperial-choice="korea">대한국 황제국</button>
+            <button class="decisionBtn primary" data-imperial-choice="joseon">조선 황제국</button>
+            <button class="decisionBtn" data-imperial-choice="cancel">칭제 보류</button>`:""}
+        </div>
+      </div>`;
+    }
+    h+=`</div>`;
+  }
+  return h;
+}
+function bindStrategicDecisionButtons(root=document){
+  root.querySelectorAll("[data-strategy-start]").forEach(b=>b.onclick=()=>beginStrategicDecision(b.dataset.strategyStart));
+  root.querySelectorAll("[data-strategy-cancel]").forEach(b=>b.onclick=()=>cancelStrategicDecision(b.dataset.strategyCancel));
+  root.querySelectorAll("[data-strategy-complete]").forEach(b=>b.onclick=()=>completeStrategicDecision(b.dataset.strategyComplete));
+  root.querySelectorAll("[data-imperial-choice]").forEach(b=>b.onclick=()=>completeStrategicDecision("proclaim_empire",b.dataset.imperialChoice));
+}
+
 /* ===== 국체 전환(Conversion) 이벤트 ===== */
 function conversionEvents(s){
   const out=[], j=s.joseon, y=s.date.year;
@@ -1448,15 +1689,7 @@ function conversionEvents(s){
   };
 
   // 대체역사상 충분한 국력이 쌓였을 때만 논의가 발생한다.
-  const eligible =
-    y>=1400 &&
-    !s.flags.conversion_decided &&
-    s.dynasty.regime!=="republic" &&
-    !s.dynasty.imperial &&
-    j.national_power>=64 &&
-    j.royal_authority>=63 &&
-    j.stability>=55 &&
-    j.military>=58;
+  const eligible = false;
 
   if(eligible){
     let risk="높다";
@@ -1589,6 +1822,77 @@ function chainEvents(s){
       ],["연쇄 사건"])});
   }
   return out;
+}
+
+
+/* ===== 직접 외교 행동 ===== */
+function dipCooldownKey(target,action){return `${target}:${action}`}
+function dipOnCooldown(target,action){
+  const until=state.diplomacyState.cooldowns[dipCooldownKey(target,action)]||-1;
+  return state.turn<until;
+}
+function setDipCooldown(target,action,turns=3){state.diplomacyState.cooldowns[dipCooldownKey(target,action)]=state.turn+turns}
+function diplomaticAction(target,action){
+  const f=state.factions[target];if(!f)return;
+  if(dipOnCooldown(target,action))return;
+  let note="";
+  if(action==="improve"){
+    if(state.joseon.treasury<2)return;
+    state.joseon.treasury=clamp(state.joseon.treasury-2);f.relation=clamp(f.relation+8);f.tension=clamp(f.tension-3);
+    state.joseon.diplomacy=clamp(state.joseon.diplomacy+1);note=`${target}과의 관계를 개선했다.`;setDipCooldown(target,action,3);
+  }else if(action==="envoy"){
+    if(state.joseon.treasury<1)return;
+    state.joseon.treasury=clamp(state.joseon.treasury-1);f.relation=clamp(f.relation+4);state.joseon.diplomacy=clamp(state.joseon.diplomacy+2);
+    note=`${target}에 사신을 파견했다.`;setDipCooldown(target,action,2);
+  }else if(action==="trade"){
+    if(state.joseon.diplomacy<30)return;
+    const chance=(f.relation+state.joseon.diplomacy)/200;
+    if(Math.random()<chance){
+      state.joseon.commerce=clamp(state.joseon.commerce+3);state.joseon.treasury=clamp(state.joseon.treasury+2);f.relation=clamp(f.relation+3);
+      note=`${target}과의 통상 협상이 성과를 냈다.`;
+    }else{
+      f.tension=clamp(f.tension+2);note=`${target}이 통상 확대 요구를 거절했다.`;
+    }
+    setDipCooldown(target,action,4);
+  }else if(action==="pressure"){
+    if(state.joseon.military<50)return;
+    f.tension=clamp(f.tension+8);f.relation=clamp(f.relation-6);state.joseon.royal_authority=clamp(state.joseon.royal_authority+1);
+    note=`${target}에 외교적 압박을 가했다.`;setDipCooldown(target,action,3);
+  }else if(action==="appease"){
+    if(state.joseon.treasury<3)return;
+    state.joseon.treasury=clamp(state.joseon.treasury-3);f.tension=clamp(f.tension-8);f.relation=clamp(f.relation+4);
+    note=`${target}과의 긴장을 완화했다.`;setDipCooldown(target,action,3);
+  }
+  state.diplomacyState.lastAction=note;state.diplomacyState.lastActionTurn=state.turn;
+  state.foreign_actions.push(note);state.foreign_actions=state.foreign_actions.slice(-16);
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"외교 행동",choice:note,result:`관계 ${Math.round(f.relation)} / 긴장 ${Math.round(f.tension)}`,ruler:headOfStateText(state),category:"외교"});
+  recompute(state);persist();render();toast(note);
+}
+function diplomacyHTML(){
+  let h=`<div class="decisionIntro">외교 행동은 <b>턴 이벤트를 기다리지 않고 직접 실행</b>할 수 있습니다. 행동별로 짧은 재사용 대기시간이 있습니다.</div>
+  <div class="diplomacyGrid">`;
+  for(const [n,f] of Object.entries(state.factions)){
+    h+=`<div class="dipCard">
+      <div class="diplomacyHeader"><div><h3>${n}</h3><div class="dipMeta">태도 ${relationText(f.relation)} · 관계 ${Math.round(f.relation)} · 긴장 ${Math.round(f.tension)}<br>세력 ${Math.round(f.power)} · 안정 ${Math.round(f.stability)}</div></div>
+      <span class="decisionRisk ${f.tension>=65?"extreme":f.tension>=45?"high":""}">${tensionText(f.tension)}</span></div>
+      <div class="relationBar"><i style="width:${Math.max(0,Math.min(100,f.relation))}%"></i></div>
+      <div class="dipActions">
+        <button class="dipBtn primary" data-dip="${n}|improve" ${dipOnCooldown(n,"improve")?"disabled":""}>관계 개선</button>
+        <button class="dipBtn" data-dip="${n}|envoy" ${dipOnCooldown(n,"envoy")?"disabled":""}>사신 파견</button>
+        <button class="dipBtn" data-dip="${n}|trade" ${dipOnCooldown(n,"trade")?"disabled":""}>통상 요구</button>
+        <button class="dipBtn" data-dip="${n}|appease" ${dipOnCooldown(n,"appease")?"disabled":""}>긴장 완화</button>
+        <button class="dipBtn danger" data-dip="${n}|pressure" ${dipOnCooldown(n,"pressure")?"disabled":""}>외교 압박</button>
+      </div>
+    </div>`;
+  }
+  h+=`</div>`;
+  if(state.diplomacyState.lastAction)h+=`<div class="report" style="margin-top:10px"><b>최근 외교 행동</b><br>${state.diplomacyState.lastAction}</div>`;
+  return h;
+}
+function bindDiplomacyButtons(root=document){
+  root.querySelectorAll("[data-dip]").forEach(b=>b.onclick=()=>{
+    const [target,action]=b.dataset.dip.split("|");diplomaticAction(target,action);
+  });
 }
 
 /* ===== 절차적 사건 풀 ===== */
@@ -1812,11 +2116,6 @@ function nextEvent(s){
   const succPriority=succ.filter(x=>x.weight>=180);
   if(succPriority.length)return weightedPick(rng,succPriority);
 
-  if(s.war?.active && rng()<.42){
-    const we=warEvents(s,rng);
-    if(we.length)return weightedPick(rng,we);
-  }
-
   const chains=chainEvents(s);
   if(chains.length)return weightedPick(rng,chains);
 
@@ -1824,15 +2123,11 @@ function nextEvent(s){
   const pathPriority=paths.filter(x=>x.weight>=145);
   if(pathPriority.length)return weightedPick(rng,pathPriority);
 
-  const conv=conversionEvents(s);
-  const convPriority=conv.filter(x=>x.weight>=180);
-  if(convPriority.length)return weightedPick(rng,convPriority);
-
   const h=historical(s);
-  const priority=h.filter(x=>x.weight>=150);
+  const priority=h.filter(x=>x.weight>=150 && !["hist_capital","hist_hanyang"].includes(x.event.id));
   if(priority.length)return weightedPick(rng,priority);
 
-  return weightedPick(rng,h.concat(reb).concat(succ).concat(paths).concat(conv).concat(procedural(s,rng)));
+  return weightedPick(rng,h.filter(x=>!["hist_capital","hist_hanyang"].includes(x.event.id)).concat(reb).concat(succ).concat(paths).concat(procedural(s,rng)));
 }
 
 function updateChains(s,ev,ch){
@@ -1981,7 +2276,7 @@ function resolveChoice(i){
   applyRepublicFlags(state);
   if(ev.id.startsWith("hist_")&&!state.fired.includes(ev.id))state.fired.push(ev.id);
   remember(state,ev);
-  simulateDomestic(state,rng);simulateForeign(state,rng);applyPathPassive(state);advanceStrategicSystems(state,rng);
+  simulateDomestic(state,rng);simulateForeign(state,rng);applyPathPassive(state);advanceStrategicSystems(state,rng);advanceStrategicDecisions(state);
   state.turn++;advance(state);rulerEvolution(state);recompute(state);
   state.last_result=summarize(before,state.joseon);
   state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:ev.title,choice:ch.text,result:state.last_result,ruler:state.dynasty.ruler,category:ev.category});
@@ -2038,8 +2333,8 @@ function renderSide(){
   }else if(sideTab==="foreign"){
     el.innerHTML=`<div class="cardTitle">주변국</div>`+Object.entries(state.factions).map(([n,f])=>`<div class="foreignCard"><div class="charTop"><b>${n}</b><span class="small">${relationText(f.relation)}</span></div><div class="small">긴장 ${tensionText(f.tension)} · 세력 ${Math.round(f.power)}</div></div>`).join("")+
       `<div class="cardTitle" style="margin-top:10px">최근 보고</div>`+(state.foreign_actions.slice(-4).reverse().map(x=>`<div class="report">• ${x}</div>`).join("")||`<div class="small">특별한 보고 없음</div>`);
-  }else if(sideTab==="decisions"){
-    el.innerHTML=decisionHTML();bindDecisionButtons(el);
+  }else if(sideTab==="military"){
+    el.innerHTML=militaryHTML();bindMilitaryButtons(el);
   }else{
     el.innerHTML=state.chronicle.length?state.chronicle.slice(-12).reverse().map(e=>`<div class="chronicle"><h4>${e.year}년 ${e.season} · ${e.ruler}</h4><p>${e.event} — ${e.choice}</p><span class="small">${e.result}</span></div>`).join(""):`<div class="small">아직 기록 없음</div>`;
   }
@@ -2048,10 +2343,15 @@ function renderMobileSections(){
   document.querySelector("#mProvinceGrid").innerHTML=Object.entries(state.provinces).map(([n,p])=>`<div class="provinceCard"><h4>${n}</h4><div>인구 ${(p.population/10000).toFixed(1)}만<br>민심 ${Math.round(p.public_support)} · 치안 ${Math.round(p.security)}<br>농업 ${Math.round(p.agriculture)} · 군사 ${Math.round(p.military)}</div></div>`).join("");
   document.querySelector("#mCharacters").innerHTML=`<div class="report"><b>${state.dynasty.stateName||"조선"} · ${headOfStateText(state)}</b><br><span class="small">${isRepublic(state)?state.dynasty.governmentName:`후계 ${state.dynasty.heir||"미정"}`} · ${state.dynasty.eraName?`연호 ${state.dynasty.eraName} · `:""}${era(state)}</span></div>`+
     Object.entries(state.characters).filter(([,c])=>c.alive).map(([n,c])=>`<div class="charCard"><div class="charTop"><b>${n}</b><span class="small">${c.role||""}</span></div><div class="small">영향력 ${Math.round(c.influence)} · 충성 ${Math.round(c.loyalty)} · 야심 ${Math.round(c.ambition)}</div><div class="bar"><i style="width:${c.influence}%"></i></div></div>`).join("");
-  document.querySelector("#mForeign").innerHTML=Object.entries(state.factions).map(([n,f])=>`<div class="foreignCard"><div class="charTop"><b>${n}</b><span class="small">${relationText(f.relation)}</span></div><div class="small">긴장 ${tensionText(f.tension)} · 세력 ${Math.round(f.power)} · 안정 ${Math.round(f.stability)}</div></div>`).join("")+
-    `<div class="cardTitle" style="margin-top:12px">최근 천하 동향</div>`+(state.foreign_actions.slice(-6).reverse().map(x=>`<div class="report">• ${x}</div>`).join("")||`<div class="small">특별한 보고 없음</div>`);
+  document.querySelector("#mForeign").innerHTML=diplomacyHTML();
+  bindDiplomacyButtons(document.querySelector("#mForeign"));
   document.querySelector("#mChronicle").innerHTML=state.chronicle.length?state.chronicle.slice(-20).reverse().map(e=>`<div class="chronicle"><h4>${e.year}년 ${e.season} · ${e.ruler}</h4><p>${e.event} — ${e.choice}</p><span class="small">${e.result}</span></div>`).join(""):`<div class="small">아직 기록 없음</div>`;
 }
+
+function renderStrategicDecisions(){
+  const el=document.querySelector("#mDecisions");if(el){el.innerHTML=strategicDecisionsHTML();bindStrategicDecisionButtons(el)}
+}
+
 function renderInternal(){
   const a=[["행정력","administration"],["기술력","technology"],["외교력","diplomacy"],["식량","food"],["상업","commerce"],["수군","navy"],["보건","health"],["문화","culture"]];
   document.querySelector("#internalGrid").innerHTML=a.map(([l,k])=>`<div class="internalItem"><span>${l}</span><b>${Math.round(state.joseon[k])}</b></div>`).join("");
@@ -2091,17 +2391,17 @@ function render(){
     eventHTML("");
     eventHTML("m");
   }
-  renderSide();renderMobileSections();renderInternal();renderDecisions();renderWarHud();
+  renderSide();renderMobileSections();renderInternal();renderStrategicDecisions();renderMilitary();renderWarHud();
 }
-function persist(){localStorage.setItem("joseon1393_v7",JSON.stringify(state))}
+function persist(){localStorage.setItem("joseon1393_v8",JSON.stringify(state))}
 function saveFile(){
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download=`joseon_v7_${state.date.year}_${state.date.season}.json`;a.click();URL.revokeObjectURL(a.href);
+  a.href=URL.createObjectURL(blob);a.download=`joseon_v8_${state.date.year}_${state.date.season}.json`;a.click();URL.revokeObjectURL(a.href);
 }
 function migrate(s){
   if(!s)return null;
-  if(![5,6,7].includes(s.version))return null;
-  s.version=7;
+  if(![5,6,7,8].includes(s.version))return null;
+  s.version=8;
   if(!s.pathScores)s.pathScores={council:0,royal:0,maritime:0,northern:0};
   if(!s.war)s.war={active:false,target:"",planKey:"",goal:"",type:"",score:0,exhaustion:0,readiness:55,turns:0,stance:"balanced",actionUsedTurn:-1,prep:null,lastReport:"",history:[]};
   if(typeof s.war.readiness!=="number")s.war.readiness=55;
@@ -2110,16 +2410,28 @@ function migrate(s){
   if(!s.dynasty.regime)s.dynasty.regime="monarchy";
   if(!s.dynasty.governmentName)s.dynasty.governmentName=s.dynasty.regime==="republic"?"의정공화정":"왕정";
   if(typeof s.dynasty.successionCount!=="number")s.dynasty.successionCount=0;
+  if(!s.diplomacyState)s.diplomacyState={cooldowns:{},lastAction:"",lastActionTurn:-1};
+  if(!s.diplomacyState.cooldowns)s.diplomacyState.cooldowns={};
+  if(!s.strategicDecisions)s.strategicDecisions={projects:{},completed:[]};
+  if(!s.strategicDecisions.projects)s.strategicDecisions.projects={};
+  if(!Array.isArray(s.strategicDecisions.completed))s.strategicDecisions.completed=[];
   return s;
 }
 function loadFile(file){
   const r=new FileReader();
-  r.onload=()=>{try{const x=migrate(JSON.parse(r.result));if(!x)throw Error();state=x;if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);persist();render();toast("저장 파일을 불러왔습니다.")}catch(e){console.error(e);toast("V5/V6/V7 저장 파일이 아닙니다.")}};
+  r.onload=()=>{try{const x=migrate(JSON.parse(r.result));if(!x)throw Error();state=x;if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);persist();render();toast("저장 파일을 불러왔습니다.")}catch(e){console.error(e);toast("V5~V8 저장 파일이 아닙니다.")}};
   r.readAsText(file);
 }
 
 let sideTab="provinces";
 document.querySelectorAll(".sideTab").forEach(b=>b.onclick=()=>{sideTab=b.dataset.side;document.querySelectorAll(".sideTab").forEach(x=>x.classList.toggle("active",x===b));renderSide()});
+
+document.querySelectorAll(".moreTab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".moreTab").forEach(x=>x.classList.toggle("active",x===b));
+  document.querySelectorAll(".morePane").forEach(x=>x.style.display="none");
+  const pane=document.querySelector("#more-"+b.dataset.more);if(pane)pane.style.display="block";
+});
+
 document.querySelectorAll(".navBtn").forEach(b=>b.onclick=()=>{document.querySelectorAll(".navBtn").forEach(x=>x.classList.toggle("active",x===b));document.querySelectorAll(".mobileScreen").forEach(x=>x.classList.remove("active"));document.querySelector("#screen-"+b.dataset.screen).classList.add("active")});
 document.querySelector("#newBtn").onclick=()=>{if(confirm("새 게임을 시작할까요? 현재 진행은 새 상태로 덮어씁니다.")){state=newGame();persist();render()}};
 document.querySelector("#saveBtn").onclick=saveFile;
@@ -2127,10 +2439,11 @@ document.querySelector("#loadInput").onchange=e=>{if(e.target.files[0])loadFile(
 
 let state;
 try{
+  const v8=localStorage.getItem("joseon1393_v8");
   const v7=localStorage.getItem("joseon1393_v7");
   const v6=localStorage.getItem("joseon1393_v6");
   const v5=localStorage.getItem("joseon1393_v5");
-  state=migrate(JSON.parse(v7||v6||v5))||newGame();
+  state=migrate(JSON.parse(v8||v7||v6||v5))||newGame();
 }catch{state=newGame()}
 if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);
 recompute(state);render();

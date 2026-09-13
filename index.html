@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#172019">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>조선 1393 · 대체역사 시뮬레이터 V12.1</title>
+<title>조선 1393 · 대체역사 시뮬레이터 V13</title>
 <style>
 :root{
   --bg:#101712;
@@ -142,7 +142,7 @@ button{cursor:pointer}
 
 .sidePanel{padding:14px;min-height:420px}
 .sideTabs{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:12px}
-.sideTab{border:0;border-radius:10px;padding:9px 6px;background:#e7dfcc;color:#655e50;font-size:12px}
+.sideTab{border:0;border-radius:10px;padding:9px 4px;background:#e7dfcc;color:#655e50;font-size:11px}
 .sideTab.active{background:#283a2d;color:white}
 .cardTitle{font-size:13px;font-weight:800;margin:3px 0 8px}
 table{width:100%;border-collapse:collapse;font-size:12px}
@@ -393,6 +393,36 @@ th{font-weight:700;color:#766f61}
   .miniCard .num{font-size:18px;font-weight:850;margin-top:3px}
   .provinceGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
   .provinceCard{background:#f7f1e2;border:1px solid #d9cdb0;border-radius:13px;padding:11px}
+  .adminGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+  .sidePanel .adminGrid{grid-template-columns:1fr}
+  .adminCard{
+    background:#f8f2e5;border:1px solid #d6c8a8;border-radius:14px;padding:11px;color:#292b25
+  }
+  .adminCard.frontier{border-color:#b99a63;background:#fff5df}
+  .adminCard.formal{border-color:#94a183;background:#f1f5e9}
+  .adminHead{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+  .adminHead h4{margin:0;font-size:14px}
+  .adminStatus{font-size:9px;padding:3px 6px;border-radius:999px;background:#ddd2b7;color:#655b47;white-space:nowrap}
+  .adminStatus.frontier{background:#a26b35;color:#fff}
+  .adminStatus.formal{background:#4d6b4f;color:#fff}
+  .adminStats{font-size:10px;color:#71695c;line-height:1.6;margin-top:5px}
+  .adminBars{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:7px}
+  .adminMini{font-size:9px;color:#756d60}
+  .adminMini .bar{margin-top:2px}
+  .adminActions{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+  .adminBtn{
+    border:1px solid #aa976e;background:#fffdf8;color:#3e392f;border-radius:8px;
+    padding:6px 7px;font-size:10px;font-weight:750
+  }
+  .adminBtn.primary{background:#344c39;color:white;border-color:#344c39}
+  .adminBtn.danger{background:#873b34;color:white;border-color:#873b34}
+  .adminBtn:disabled{opacity:.4}
+  .integrationTrack{height:7px;border-radius:999px;background:#ded3bb;overflow:hidden;margin-top:6px}
+  .integrationTrack i{display:block;height:100%;background:#72836e}
+  .historicalDecision{
+    border-left:4px solid #98763b;background:#fff8e8
+  }
+
   .provinceCard h4{margin:0 0 5px;font-size:14px}
   .provinceCard div{font-size:11px;color:#746c5e;line-height:1.6}
   .bottomNav{
@@ -461,7 +491,7 @@ th{font-weight:700;color:#766f61}
 
     <aside class="panel sidePanel">
       <div class="sideTabs">
-        <button class="sideTab active" data-side="provinces">8도</button>
+        <button class="sideTab active" data-side="provinces">행정구역</button>
         <button class="sideTab" data-side="characters">인물</button>
         <button class="sideTab" data-side="foreign">외교</button>
         <button class="sideTab" data-side="military">군사</button>
@@ -490,8 +520,8 @@ th{font-weight:700;color:#766f61}
 
     <div id="screen-map" class="mobileScreen">
       <article class="mobilePaper">
-        <div class="sectionLabel">팔도 현황</div>
-        <h2 class="eventTitle" style="font-size:22px">전국</h2>
+        <div class="sectionLabel">행정구역</div>
+        <h2 class="eventTitle" style="font-size:22px">전국 행정</h2>
         <div id="mProvinceGrid" class="provinceGrid"></div>
       </article>
     </div>
@@ -547,7 +577,7 @@ th{font-weight:700;color:#766f61}
 
 <nav class="bottomNav">
   <button class="navBtn active" data-screen="court"><span>🏯</span>조정</button>
-  <button class="navBtn" data-screen="map"><span>🗺️</span>전국</button>
+  <button class="navBtn" data-screen="map"><span>🗺️</span>행정구역</button>
   <button class="navBtn" data-screen="foreign"><span>🌏</span>외교</button>
   <button class="navBtn" data-screen="military"><span>⚔️</span>군사</button>
   <button class="navBtn" data-screen="more"><span>☰</span>더보기</button>
@@ -603,7 +633,7 @@ function newGame(){
     "함길":{population:510000,tax:34,public_support:53,security:45,agriculture:39,military:67,development:34}
   };
   const s={
-    version:12,seed:Math.floor(Math.random()*900000000)+1,turn:0,date:{year:1393,season:"봄"},
+    version:13,seed:Math.floor(Math.random()*900000000)+1,turn:0,date:{year:1393,season:"봄"},
     dynasty:{ruler:"태조 이성계",reignStart:1392,heir:"이방석",line:"founding",prestige:62,stateName:"조선",sovereignTitle:"왕",eraName:"",imperial:false,statePath:"",statePathLevel:0,regime:"monarchy",governmentName:"왕정",successionCount:0},
     joseon:{population:0,external_population:0,national_power:46,treasury:54,military:57,royal_authority:58,public_support:60,administration:47,technology:32,diplomacy:43,food:58,stability:61,corruption:39,commerce:26,navy:42,health:44,culture:38},
     provinces,
@@ -640,6 +670,7 @@ function newGame(){
     fiscal:{taxPolicy:"normal",lastRevenue:0,lastBaseRevenue:0,lastBonusRevenue:0,lastExpense:0,history:[]},
     strategicDecisions:{projects:{},completed:[],imperialDraft:{open:false,stateName:"대한국",eraName:"건흥"}},
     territorialHoldings:[],
+    adminActions:{},
     recentCategories:[],recentIds:[],fired:[],chronicle:[],foreign_actions:[],chains:{},
     last_result:"",current_event:null,game_over:false,game_over_reason:""
   };
@@ -919,6 +950,118 @@ function historical(s){
         choice("현 국경선을 지키며 무리한 확장은 피한다.",{joseon:{treasury:-4,military:3},provinces:{"평안":{security:6},"함길":{security:6}}},{northern_policy:"defense"},"안정적 방어")
       ],["실제 역사","북방"]));
   }
+
+  if(y>=1402&&y<=1404&&!s.flags.hist_shinmungo){
+    push(205,makeEvent("hist_shinmungo","행정","신문고를 설치하다",
+      "백성이 억울한 일을 중앙에 직접 호소할 통로를 마련하자는 건의가 올라왔다. 지방 수령의 전횡을 견제할 수 있지만 상급 관료들은 행정 질서가 흔들릴 것을 우려한다.",
+      [
+        choice("신문고를 설치하고 직접 호소를 허용한다.",{joseon:{treasury:-3,public_support:7,administration:4,royal_authority:2}},{hist_shinmungo:true},"민원 통로 확대"),
+        choice("감사와 관찰사를 통한 상소 절차만 강화한다.",{joseon:{administration:4,public_support:3,treasury:-1}},{hist_shinmungo:true},"관료제 중심"),
+        choice("지방 질서를 이유로 설치를 미룬다.",{joseon:{royal_authority:-1,public_support:-3}},{hist_shinmungo:true},"보수적 대응")
+      ],["실제 역사","1402년"],
+      {title:"실제 역사",quote:"태종 2년인 1402년 신문고가 설치되었다.",note:"백성의 억울한 사정을 국왕에게 알리는 제도적 통로였다."}
+    ));
+  }
+  if(y>=1402&&y<=1405&&!s.flags.hist_worldmap){
+    push(175,makeEvent("hist_worldmap","과학","세계지도를 편찬하다",
+      "명과 일본을 통해 들어온 지도와 조선의 지리 정보를 합쳐 광대한 세계지도를 만들자는 계획이 추진되고 있다.",
+      [
+        choice("국가 사업으로 세계지도 편찬을 후원한다.",{joseon:{treasury:-4,technology:5,diplomacy:4,culture:3}},{hist_worldmap:true},"지리 지식 확대"),
+        choice("조선과 인접국 지도 제작에 집중한다.",{joseon:{treasury:-2,technology:3,administration:3}},{hist_worldmap:true},"실용 지도"),
+        choice("군사 지도만 비밀리에 정비한다.",{joseon:{treasury:-2,military:2,technology:2}},{hist_worldmap:true},"군사 활용")
+      ],["실제 역사","1402년"],
+      {title:"실제 역사",quote:"1402년 혼일강리역대국도지도가 제작되었다.",note:"조선 초기 세계 인식과 지도학의 수준을 보여 주는 대표적 지도다."}
+    ));
+  }
+  if(y>=1413&&y<=1415&&!s.flags.hist_eight_provinces){
+    push(200,makeEvent("hist_eight_provinces","행정","8도의 경계를 정비하다",
+      "새 왕조의 지방 통치를 안정시키기 위해 도의 경계와 군현 체계를 명확하게 정리해야 한다는 논의가 이어지고 있다.",
+      [
+        choice("전국 8도의 경계와 관할을 대대적으로 정비한다.",{joseon:{treasury:-3,administration:6,stability:4}},{hist_eight_provinces:true},"지방 행정 정비"),
+        choice("북방과 수도권부터 우선 조정한다.",{joseon:{treasury:-2,administration:4,military:2}},{hist_eight_provinces:true},"전략 지역 우선"),
+        choice("기존 경계를 유지해 혼란을 피한다.",{joseon:{stability:2,administration:-1}},{hist_eight_provinces:true},"현상 유지")
+      ],["실제 역사","1413년"],
+      {title:"실제 역사",quote:"태종 13년 무렵 조선의 8도 행정구역 체계가 정비되었다.",note:"게임에서는 이후 영토 확장 시 기존 8도 밖의 지역을 별도 편입지와 정식 주로 관리한다."}
+    ));
+  }
+  if(y>=1428&&y<=1431&&!s.flags.hist_nongsajikseol){
+    push(205,makeEvent("hist_nongsajikseol","농업","『농사직설』을 편찬하다",
+      "각 지방의 경험 많은 농민에게 우리 풍토에 맞는 농사법을 조사해 농서로 정리하라는 명이 내려졌다.",
+      [
+        choice("전국의 농법을 조사해 농사직설을 편찬·보급한다.",{joseon:{treasury:-4,food:7,technology:4},provinces:{"충청":{agriculture:3},"전라":{agriculture:3},"경상":{agriculture:3}}},{hist_nongsajikseol:true},"농업 생산 향상"),
+        choice("하삼도의 선진 농법만 북방에 보급한다.",{joseon:{treasury:-2,food:5},provinces:{"평안":{agriculture:5},"함길":{agriculture:5}}},{hist_nongsajikseol:true},"북방 농업 개선"),
+        choice("농민의 구전 농법에 맡긴다.",{joseon:{treasury:2,technology:-1}},{hist_nongsajikseol:true},"투자 보류")
+      ],["실제 역사","1429년"],
+      {title:"실제 역사",quote:"『농사직설』은 1429년 편찬되었다.",note:"조선의 풍토에 맞는 농법을 조사·정리한 대표적 농서다."}
+    ));
+  }
+  if(y>=1433&&y<=1435&&!s.flags.hist_jagyeongnu){
+    push(195,makeEvent("hist_jagyeongnu","과학","자격루와 천문의기",
+      "장영실과 기술자들이 스스로 시각을 알리는 물시계와 천문 관측기구 제작에 성공할 가능성을 보이고 있다.",
+      [
+        choice("자격루와 천문의기 제작에 집중 투자한다.",{joseon:{treasury:-6,technology:8,administration:3,culture:3}},{hist_jagyeongnu:true},"과학기술 도약"),
+        choice("자격루만 우선 완성한다.",{joseon:{treasury:-4,technology:6,administration:2}},{hist_jagyeongnu:true},"표준시 확립"),
+        choice("비용을 줄이고 기존 시각제도를 유지한다.",{joseon:{treasury:2,technology:-2}},{hist_jagyeongnu:true},"보수적 선택")
+      ],["실제 역사","1433~1434년"],
+      {title:"실제 역사",quote:"자격루는 1433년 시제품이 완성되고 1434년부터 공식 사용되었다.",note:"세종대 천문·시간 측정 기술 발전의 상징적 성과다."}
+    ));
+  }
+  if(y>=1433&&y<=1435&&!s.flags.hist_hyangyak){
+    push(175,makeEvent("hist_hyangyak","의학","『향약집성방』 편찬",
+      "조선에서 나는 약재와 치료법을 모아 지방에서도 활용할 수 있는 의학서를 편찬하자는 계획이 올라왔다.",
+      [
+        choice("향약과 치료법을 체계적으로 정리해 전국에 보급한다.",{joseon:{treasury:-4,health:8,technology:3,public_support:3}},{hist_hyangyak:true},"의료 기반 강화"),
+        choice("궁중과 군진 의료에 우선 활용한다.",{joseon:{treasury:-3,health:5,military:2}},{hist_hyangyak:true},"군진 의료"),
+        choice("중국 의서를 수입하는 데 집중한다.",{joseon:{treasury:-2,diplomacy:2,health:3}},{hist_hyangyak:true},"수입 의학")
+      ],["실제 역사","1433년"],
+      {title:"실제 역사",quote:"『향약집성방』은 세종대에 편찬된 향약 의학서이다.",note:"국산 약재와 치료법을 체계화하려는 국가적 의료 사업이었다."}
+    ));
+  }
+  if(y>=1441&&y<=1443&&!s.flags.hist_cheugugi){
+    push(205,makeEvent("hist_cheugugi","과학","측우제도를 전국에 시행하다",
+      "땅에 스며든 빗물만으로 강우량을 판단하는 방식 대신 일정한 그릇에 빗물을 받아 수치를 기록하는 제도가 제안되었다.",
+      [
+        choice("측우기를 각 도와 주요 관청에 보급한다.",{joseon:{treasury:-4,technology:6,food:5,administration:3}},{hist_cheugugi:true},"과학적 농정"),
+        choice("중앙과 하삼도에서 먼저 시험한다.",{joseon:{treasury:-2,technology:4,food:3}},{hist_cheugugi:true},"단계적 보급"),
+        choice("기존 강우 보고 방식을 유지한다.",{joseon:{treasury:1,technology:-1}},{hist_cheugugi:true},"현상 유지")
+      ],["실제 역사","1441~1442년"],
+      {title:"실제 역사",quote:"1441년 측우기가 제작되고 다음 해 측정 원칙이 정비되었다.",note:"중앙과 지방에서 강우량을 수치로 보고하는 체계가 마련되었다."}
+    ));
+  }
+  if(y>=1443&&y<=1445&&!s.flags.hist_gongbeop){
+    push(200,makeEvent("hist_gongbeop","재정","공법의 시행",
+      "토지세를 보다 일정하게 거두되 토질과 풍흉을 고려하는 새로운 전세제도를 전국에 적용할지를 두고 논쟁이 이어지고 있다.",
+      [
+        choice("공법을 전국적으로 시행한다.",{joseon:{administration:6,treasury:6,public_support:2}},{hist_gongbeop:true},"전세제도 정비"),
+        choice("풍흉 차이가 큰 지역은 예외를 둔다.",{joseon:{administration:4,treasury:4,public_support:4}},{hist_gongbeop:true},"유연한 세제"),
+        choice("기존 답험손실법을 유지한다.",{joseon:{public_support:1,administration:-1}},{hist_gongbeop:true},"개혁 보류")
+      ],["실제 역사","1443년"],
+      {title:"실제 역사",quote:"세종대 오랜 논의를 거쳐 1443년 공법이 시행되었다.",note:"전세를 보다 체계적으로 운영하려는 조세 개혁이었다."}
+    ));
+  }
+  if(y>=1442&&y<=1445&&!s.flags.hist_chiljeongsan){
+    push(185,makeEvent("hist_chiljeongsan","과학","『칠정산』을 완성하다",
+      "이순지와 김담 등이 한양의 위치에 맞춰 천문 현상을 계산하는 역법 연구를 마무리하고 있다.",
+      [
+        choice("칠정산 내·외편 연구를 전폭 지원한다.",{joseon:{treasury:-5,technology:8,culture:4,administration:2}},{hist_chiljeongsan:true},"독자 역법"),
+        choice("중국 역법을 보완하는 수준으로 정리한다.",{joseon:{treasury:-3,technology:5,diplomacy:1}},{hist_chiljeongsan:true},"실용 개량"),
+        choice("연구비를 군비로 돌린다.",{joseon:{military:3,technology:-1}},{hist_chiljeongsan:true},"군사 우선")
+      ],["실제 역사","1442~1444년"],
+      {title:"실제 역사",quote:"『칠정산』은 세종대 조선의 실정에 맞춰 편찬된 역서다.",note:"한양을 기준으로 한 천문·역법 계산 능력을 보여 준다."}
+    ));
+  }
+  if(y>=1445&&y<=1447&&!s.flags.hist_yongbieocheonga){
+    push(170,makeEvent("hist_yongbieocheonga","문화","『용비어천가』를 편찬하다",
+      "새 왕조의 창업과 정통성을 노래하고 새 문자의 실제 사용을 보여 줄 대규모 문학 사업이 추진되고 있다.",
+      [
+        choice("용비어천가를 국가 사업으로 편찬한다.",{joseon:{treasury:-3,culture:7,royal_authority:3,public_support:2}},{hist_yongbieocheonga:true},"왕조 문화 강화"),
+        choice("새 문자 교육 자료 중심으로 간소화한다.",{joseon:{treasury:-2,culture:4,administration:2}},{hist_yongbieocheonga:true},"교육 우선"),
+        choice("과도한 왕실 찬양을 우려해 보류한다.",{joseon:{public_support:1,royal_authority:-2}},{hist_yongbieocheonga:true},"편찬 보류")
+      ],["실제 역사","1445년"],
+      {title:"실제 역사",quote:"『용비어천가』는 세종대에 편찬된 대표적 악장이다.",note:"훈민정음으로 기록된 초기 문헌이자 왕조 창업의 정통성을 노래했다."}
+    ));
+  }
+
   if(y>=1442&&y<=1445&&!s.flags.script_project&&s.joseon.technology>=42){
     push(150,makeEvent("hist_script","학문","백성을 위한 새 문자",
       "한자를 익히지 못한 백성도 자신의 뜻을 적을 수 있도록 새로운 문자 체계를 만들자는 구상이 국왕 주변에서 제기되었다. 학문적 혁신이지만 기존 사대부 질서의 반발도 예상된다.",
@@ -1403,9 +1546,173 @@ function setWarAction(action){
 function addHolding(s,name,from,pop=0,note=""){
   if(!Array.isArray(s.territorialHoldings))s.territorialHoldings=[];
   if(s.territorialHoldings.some(x=>x.name===name))return;
-  s.territorialHoldings.push({name,from,year:s.date.year,population:pop,note});
+  const source=s.factions?.[from];
+  s.territorialHoldings.push({
+    name,from,year:s.date.year,population:pop,note,
+    public_support:42,security:40,agriculture:44,military:36,development:31,tax:32,
+    integration:12,formalized:false,formalName:"",
+    sourcePower:source?.power||0
+  });
   s.joseon.external_population=(s.joseon.external_population||0)+pop;
 }
+
+function normalizeHolding(h){
+  if(typeof h.public_support!=="number")h.public_support=42;
+  if(typeof h.security!=="number")h.security=40;
+  if(typeof h.agriculture!=="number")h.agriculture=44;
+  if(typeof h.military!=="number")h.military=36;
+  if(typeof h.development!=="number")h.development=31;
+  if(typeof h.tax!=="number")h.tax=32;
+  if(typeof h.integration!=="number")h.integration=12;
+  if(typeof h.formalized!=="boolean")h.formalized=false;
+  if(typeof h.formalName!=="string")h.formalName="";
+  return h;
+}
+function formalProvinceName(name){
+  const map={
+    "대마도":"대마도주","대마도 남부":"대마남부주",
+    "오음회·두만강 중류":"오음회주","오도리부 영역":"오도리주",
+    "파저강 변경":"파저주","오랑캐부 세력권":"건주주",
+    "두만강 북방 산림":"두만북부주","우디캐 제부 영역":"우디캐주",
+    "해란강·모련 일대":"해란주","모련부 영역":"모련주",
+    "동부 초원":"동부초원주","북원 정권":"북원주",
+    "요동":"요동주","명 전역":"중원주",
+    "규슈 북부":"규슈북부주","일본 열도":"일본주",
+    "오키나와 북부":"오키나와북부주","류큐 제도":"류큐주",
+    "두만강 북방":"두만북부주","동부 초원 변경":"동부초원주"
+  };
+  return map[name]||`${name.replace(/\s+/g,"").replace(/영역|일대|변경/g,"")}주`;
+}
+function adminActionUsed(id){return state.adminActions?.[id]===state.turn}
+function markAdminAction(id){
+  if(!state.adminActions)state.adminActions={};
+  state.adminActions[id]=state.turn;
+}
+function provinceAdminAction(name,action){
+  const p=state.provinces[name];if(!p||adminActionUsed(`p:${name}`))return;
+  const j=state.joseon;
+  if(action==="relief"){
+    if(j.treasury<2)return;j.treasury=clamp(j.treasury-2);p.public_support=clamp(p.public_support+5);p.tax=clamp(p.tax-1);
+  }else if(action==="security"){
+    if(j.treasury<3)return;j.treasury=clamp(j.treasury-3);p.security=clamp(p.security+6);p.military=clamp(p.military+1);
+  }else if(action==="develop"){
+    if(j.treasury<4)return;j.treasury=clamp(j.treasury-4);p.development=clamp(p.development+4);p.tax=clamp(p.tax+2);p.public_support=clamp(p.public_support+1);
+  }else if(action==="garrison"){
+    if(j.treasury<4)return;j.treasury=clamp(j.treasury-4);p.military=clamp(p.military+5);p.security=clamp(p.security+2);p.public_support=clamp(p.public_support-1);
+  }
+  markAdminAction(`p:${name}`);
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"지방 행정",choice:`${name} · ${action}`,result:"행정 조치 시행",ruler:headOfStateText(state),category:"결정"});
+  recompute(state);persist();render();
+}
+function holdingAdminAction(name,action){
+  const h=state.territorialHoldings.find(x=>x.name===name);if(!h||h.formalized||adminActionUsed(`h:${name}`))return;
+  normalizeHolding(h);const j=state.joseon;
+  if(action==="relief"){
+    if(j.treasury<2)return;j.treasury=clamp(j.treasury-2);h.public_support=clamp(h.public_support+7);h.tax=clamp(h.tax-1);h.integration=clamp(h.integration+3);
+  }else if(action==="security"){
+    if(j.treasury<3)return;j.treasury=clamp(j.treasury-3);h.security=clamp(h.security+7);h.military=clamp(h.military+2);h.integration=clamp(h.integration+3);
+  }else if(action==="administration"){
+    if(j.treasury<3)return;j.treasury=clamp(j.treasury-3);h.integration=clamp(h.integration+14);h.development=clamp(h.development+2);h.public_support=clamp(h.public_support+2);
+  }else if(action==="settlement"){
+    if(j.treasury<4)return;j.treasury=clamp(j.treasury-4);
+    const inc=Math.max(1000,Math.round(h.population*.025));h.population+=inc;j.external_population=(j.external_population||0)+inc;
+    h.agriculture=clamp(h.agriculture+5);h.development=clamp(h.development+3);h.integration=clamp(h.integration+5);
+  }
+  markAdminAction(`h:${name}`);
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"편입지 행정",choice:`${name} · ${action}`,result:`통합도 ${Math.round(h.integration)}`,ruler:headOfStateText(state),category:"결정"});
+  recompute(state);persist();render();
+}
+function canFormalizeHolding(h){
+  normalizeHolding(h);
+  return !h.formalized &&
+    state.joseon.administration>=55 &&
+    state.joseon.treasury>=8 &&
+    h.integration>=55 &&
+    h.security>=52 &&
+    h.public_support>=45;
+}
+function formalizeHolding(name){
+  const h=state.territorialHoldings.find(x=>x.name===name);if(!h||!canFormalizeHolding(h))return;
+  const formal=formalProvinceName(h.name);
+  state.joseon.treasury=clamp(state.joseon.treasury-8);
+  state.joseon.external_population=Math.max(0,(state.joseon.external_population||0)-h.population);
+  state.provinces[formal]={
+    population:h.population,tax:Math.max(30,h.tax),public_support:Math.max(45,h.public_support),
+    security:Math.max(50,h.security),agriculture:h.agriculture,military:h.military,
+    development:Math.max(32,h.development),annexed:true,origin:h.from,formalizedYear:state.date.year
+  };
+  h.formalized=true;h.formalName=formal;h.integration=100;
+  state.joseon.administration=clamp(state.joseon.administration+2);
+  state.joseon.stability=clamp(state.joseon.stability+2);
+  state.joseon.royal_authority=clamp(state.joseon.royal_authority+1);
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"행정구역 편입",choice:`${h.name} → ${formal}`,result:"정식 주 편입 완료",ruler:headOfStateText(state),category:"결정"});
+  state.foreign_actions.push(`${h.name}이 임시 편입지에서 정식 행정구역 ${formal}으로 편입되었다.`);
+  recompute(state);persist();render();toast(`${formal} 정식 편입 완료`);
+}
+function adminCardProvince(name,p){
+  const used=adminActionUsed(`p:${name}`);
+  const isAnnexed=!!p.annexed;
+  return `<div class="adminCard ${isAnnexed?"formal":""}">
+    <div class="adminHead"><h4>${name}</h4><span class="adminStatus ${isAnnexed?"formal":""}">${isAnnexed?"정식 주":"기존 도"}</span></div>
+    <div class="adminStats">인구 ${(p.population/10000).toFixed(1)}만 · 세수 ${Math.round(p.tax)} · 개발 ${Math.round(p.development)}<br>민심 ${Math.round(p.public_support)} · 치안 ${Math.round(p.security)} · 농업 ${Math.round(p.agriculture)} · 군사 ${Math.round(p.military)}${p.origin?`<br>편입 원천: ${p.origin}`:""}</div>
+    <div class="adminBars">
+      <div class="adminMini">민심<div class="bar"><i style="width:${p.public_support}%"></i></div></div>
+      <div class="adminMini">치안<div class="bar"><i style="width:${p.security}%"></i></div></div>
+    </div>
+    <div class="adminActions">
+      <button class="adminBtn" data-provact="${name}|relief" ${used||state.joseon.treasury<2?"disabled":""}>감세·구휼</button>
+      <button class="adminBtn" data-provact="${name}|security" ${used||state.joseon.treasury<3?"disabled":""}>치안 강화</button>
+      <button class="adminBtn primary" data-provact="${name}|develop" ${used||state.joseon.treasury<4?"disabled":""}>개발 투자</button>
+      <button class="adminBtn" data-provact="${name}|garrison" ${used||state.joseon.treasury<4?"disabled":""}>군진 확충</button>
+    </div>
+  </div>`;
+}
+function adminCardHolding(h){
+  normalizeHolding(h);
+  const used=adminActionUsed(`h:${h.name}`),canFormal=canFormalizeHolding(h);
+  return `<div class="adminCard frontier">
+    <div class="adminHead"><h4>${h.name}</h4><span class="adminStatus frontier">편입 영토</span></div>
+    <div class="adminStats">인구 ${(h.population/10000).toFixed(1)}만 · 세수 ${Math.round(h.tax)} · 개발 ${Math.round(h.development)}<br>민심 ${Math.round(h.public_support)} · 치안 ${Math.round(h.security)} · 농업 ${Math.round(h.agriculture)} · 군사 ${Math.round(h.military)}<br>${h.year}년 ${h.from}에서 편입</div>
+    <div class="small" style="margin-top:6px">행정통합도 ${Math.round(h.integration)}/100</div>
+    <div class="integrationTrack"><i style="width:${h.integration}%"></i></div>
+    <div class="adminActions">
+      <button class="adminBtn" data-holdact="${h.name}|relief" ${used||state.joseon.treasury<2?"disabled":""}>구휼·감세</button>
+      <button class="adminBtn" data-holdact="${h.name}|security" ${used||state.joseon.treasury<3?"disabled":""}>치안 강화</button>
+      <button class="adminBtn primary" data-holdact="${h.name}|administration" ${used||state.joseon.treasury<3?"disabled":""}>행정관 파견</button>
+      <button class="adminBtn" data-holdact="${h.name}|settlement" ${used||state.joseon.treasury<4?"disabled":""}>이주·개간</button>
+    </div>
+    <div class="reqList">
+      <span class="req ${state.joseon.administration>=55?"ok":"no"}">행정력 55+</span>
+      <span class="req ${h.integration>=55?"ok":"no"}">통합도 55+</span>
+      <span class="req ${h.security>=52?"ok":"no"}">치안 52+</span>
+      <span class="req ${h.public_support>=45?"ok":"no"}">민심 45+</span>
+    </div>
+    <div class="adminActions">
+      <button class="adminBtn danger" data-formalize="${h.name}" ${canFormal?"":"disabled"}>정식 주 편입</button>
+      <span class="small">비용 재정 8 · 완료 후 이 버튼은 사라짐</span>
+    </div>
+  </div>`;
+}
+function administrativeHTML(){
+  const provisional=(state.territorialHoldings||[]).filter(h=>!h.formalized);
+  let h=`<div class="decisionIntro"><b>행정구역</b>에는 기존 8도와 정식 주, 새로 병합한 편입 영토가 모두 표시됩니다. 각 지역은 한 턴에 한 번 행정 조치를 할 수 있습니다.</div>`;
+  if(provisional.length)h+=`<div class="report"><b>편입 영토 ${provisional.length}곳</b><br><span class="small">행정통합·치안·민심을 확보하면 정식 주로 편입할 수 있습니다.</span></div>`;
+  h+=`<div class="adminGrid">`;
+  for(const [name,p] of Object.entries(state.provinces))h+=adminCardProvince(name,p);
+  for(const holding of provisional)h+=adminCardHolding(holding);
+  h+=`</div>`;
+  return h;
+}
+function bindAdministrativeButtons(root=document){
+  root.querySelectorAll("[data-provact]").forEach(b=>b.onclick=()=>{
+    const [name,action]=b.dataset.provact.split("|");provinceAdminAction(name,action);
+  });
+  root.querySelectorAll("[data-holdact]").forEach(b=>b.onclick=()=>{
+    const [name,action]=b.dataset.holdact.split("|");holdingAdminAction(name,action);
+  });
+  root.querySelectorAll("[data-formalize]").forEach(b=>b.onclick=()=>formalizeHolding(b.dataset.formalize));
+}
+
 function annexFaction(s,target,territory,pop=0){
   const f=s.factions[target];if(!f)return;
   f.status="annexed";f.power=0;f.tension=0;f.relation=100;f.stability=100;f.aggression=0;
@@ -2226,6 +2533,81 @@ function imperialDecisionCard(){
   </div>`;
 }
 
+
+const HISTORICAL_DECISIONS={
+  shinmungo:{
+    name:"신문고 설치",start:1402,end:1404,flag:"hist_shinmungo",cost:3,
+    desc:"백성이 억울한 일을 중앙에 직접 호소할 수 있도록 신문고를 설치한다.",
+    apply:s=>{s.joseon.public_support=clamp(s.joseon.public_support+7);s.joseon.administration=clamp(s.joseon.administration+4);s.joseon.royal_authority=clamp(s.joseon.royal_authority+2)}
+  },
+  worldmap:{
+    name:"혼일강리역대국도지도 편찬",start:1402,end:1405,flag:"hist_worldmap",cost:4,
+    desc:"조선과 동아시아, 서방 세계에 대한 지리 정보를 종합한 대형 세계지도 편찬을 후원한다.",
+    apply:s=>{s.joseon.technology=clamp(s.joseon.technology+5);s.joseon.diplomacy=clamp(s.joseon.diplomacy+4);s.joseon.culture=clamp(s.joseon.culture+3)}
+  },
+  eightdo:{
+    name:"8도 행정 경계 정비",start:1413,end:1415,flag:"hist_eight_provinces",cost:3,
+    desc:"전국의 도 경계와 지방 행정 체계를 정비해 중앙정부의 통치력을 높인다.",
+    apply:s=>{s.joseon.administration=clamp(s.joseon.administration+6);s.joseon.stability=clamp(s.joseon.stability+3);for(const p of Object.values(s.provinces))p.security=clamp(p.security+2)}
+  },
+  nongsa:{
+    name:"『농사직설』 편찬·보급",start:1428,end:1431,flag:"hist_nongsajikseol",cost:4,
+    desc:"각지 노농의 농법을 조사해 조선 풍토에 맞는 농서를 만들고 전국에 보급한다.",
+    apply:s=>{s.joseon.food=clamp(s.joseon.food+7);s.joseon.technology=clamp(s.joseon.technology+4);for(const p of Object.values(s.provinces))p.agriculture=clamp(p.agriculture+3)}
+  },
+  jagyeongnu:{
+    name:"자격루·천문의기 제작",start:1432,end:1435,flag:"hist_jagyeongnu",cost:6,
+    desc:"장영실·정초·정인지 등에게 자동 물시계와 천문 관측기구 제작을 맡긴다.",
+    apply:s=>{s.joseon.technology=clamp(s.joseon.technology+8);s.joseon.administration=clamp(s.joseon.administration+3);s.joseon.culture=clamp(s.joseon.culture+3)}
+  },
+  medicine:{
+    name:"『향약집성방』 편찬",start:1433,end:1435,flag:"hist_hyangyak",cost:4,
+    desc:"국산 약재와 의학 지식을 체계화해 지방 의료와 구휼 능력을 높인다.",
+    apply:s=>{s.joseon.health=clamp(s.joseon.health+8);s.joseon.technology=clamp(s.joseon.technology+3);s.joseon.public_support=clamp(s.joseon.public_support+3)}
+  },
+  rainGauge:{
+    name:"측우제도 전국 시행",start:1441,end:1443,flag:"hist_cheugugi",cost:4,
+    desc:"측우기를 중앙과 지방 관청에 보급해 강우량을 체계적으로 측정하고 농정을 개선한다.",
+    apply:s=>{s.joseon.technology=clamp(s.joseon.technology+6);s.joseon.food=clamp(s.joseon.food+5);for(const p of Object.values(s.provinces))p.agriculture=clamp(p.agriculture+2)}
+  },
+  gongbeop:{
+    name:"공법 시행",start:1443,end:1445,flag:"hist_gongbeop",cost:3,
+    desc:"토질과 풍흉을 고려한 전세 체계를 정비해 재정의 예측 가능성을 높인다.",
+    apply:s=>{s.joseon.administration=clamp(s.joseon.administration+6);s.joseon.treasury=clamp(s.joseon.treasury+6);s.joseon.public_support=clamp(s.joseon.public_support+2);for(const p of Object.values(s.provinces))p.tax=clamp(p.tax+2)}
+  },
+  chiljeongsan:{
+    name:"『칠정산』 완성",start:1442,end:1445,flag:"hist_chiljeongsan",cost:5,
+    desc:"한양을 기준으로 천문 역법을 계산하는 독자 역서 편찬을 완성한다.",
+    apply:s=>{s.joseon.technology=clamp(s.joseon.technology+8);s.joseon.culture=clamp(s.joseon.culture+4);s.joseon.administration=clamp(s.joseon.administration+2)}
+  },
+  yongbi:{
+    name:"『용비어천가』 편찬",start:1445,end:1447,flag:"hist_yongbieocheonga",cost:3,
+    desc:"왕조의 창업과 정통성을 새 문자와 한문으로 노래한 작품을 편찬한다.",
+    apply:s=>{s.joseon.culture=clamp(s.joseon.culture+7);s.joseon.royal_authority=clamp(s.joseon.royal_authority+3);s.joseon.public_support=clamp(s.joseon.public_support+2)}
+  }
+};
+function availableHistoricalDecisions(s=state){
+  return Object.entries(HISTORICAL_DECISIONS).filter(([,d])=>s.date.year>=d.start&&s.date.year<=d.end&&!s.flags[d.flag]);
+}
+function executeHistoricalDecision(key){
+  const d=HISTORICAL_DECISIONS[key];if(!d||state.flags[d.flag])return;
+  if(state.date.year<d.start||state.date.year>d.end||state.joseon.treasury<d.cost)return;
+  state.joseon.treasury=clamp(state.joseon.treasury-d.cost);
+  d.apply(state);state.flags[d.flag]=true;
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"역사 디시전",choice:d.name,result:"역사적 국가사업 시행",ruler:headOfStateText(state),category:"결정"});
+  recompute(state);persist();render();toast(`${d.name} 시행`);
+}
+function historicalDecisionsHTML(){
+  const arr=availableHistoricalDecisions(state);
+  if(!arr.length)return `<div class="strategyGroup"><div class="strategyGroupTitle">역사 디시전</div><div class="small">현재 연도에 새로 실행 가능한 역사 디시전이 없습니다.</div></div>`;
+  return `<div class="strategyGroup"><div class="strategyGroupTitle">역사 디시전 · ${state.date.year}년</div>`+
+    arr.map(([key,d])=>`<div class="strategicCard historicalDecision">
+      <div class="decisionTop"><h3>${d.name}</h3><span class="decisionRisk">${d.start}${d.end!==d.start?`~${d.end}`:""}년</span></div>
+      <p>${d.desc}</p>
+      <div class="decisionActions"><button class="decisionBtn primary" data-histdecision="${key}" ${state.joseon.treasury<d.cost?"disabled":""}>시행</button><span class="small">재정 ${d.cost}</span></div>
+    </div>`).join("")+`</div>`;
+}
+
 function strategicDecisionCard(key,d){
   const p=projectFor(key),done=state.strategicDecisions.completed.includes(key),reqs=d.requirements(state),ok=reqs.every(x=>x[0]);
   const riskClass=d.risk==="극단적"?"extreme":d.risk==="높음"?"high":"";
@@ -2249,8 +2631,9 @@ function strategicDecisionCard(key,d){
 function strategicDecisionsHTML(){
   const imperial=STRATEGIC_DECISIONS.proclaim_empire;
   const groups=[...new Set(Object.entries(STRATEGIC_DECISIONS).filter(([k])=>k!=="proclaim_empire").map(([,x])=>x.group))];
-  let h=`<div class="decisionIntro">국가 결정은 랜덤 사건이 아니라 <b>직접 추진</b>합니다. 칭제건원은 상시 결정으로 항상 표시되며, 조건을 충족하면 추진할 수 있습니다.</div>
+  let h=`<div class="decisionIntro">국가 결정은 랜덤 사건이 아니라 <b>직접 추진</b>합니다. 연도에 맞는 실제 역사 기반 정책은 <b>역사 디시전</b>으로 나타납니다.</div>
     ${fiscalPanelHTML()}
+    ${historicalDecisionsHTML()}
     <div class="strategyGroup"><div class="strategyGroupTitle">상시 결정</div>${imperialDecisionCard()}</div>`;
   for(const group of groups){
     h+=`<div class="strategyGroup"><div class="strategyGroupTitle">${group}</div>`;
@@ -2271,6 +2654,7 @@ function bindStrategicDecisionButtons(root=document){
   root.querySelectorAll("[data-imperial-era]").forEach(b=>b.onclick=()=>setImperialDraft("eraName",b.dataset.imperialEra));
   root.querySelectorAll("[data-imperial-execute]").forEach(b=>b.onclick=executeImperialDecision);
   root.querySelectorAll("[data-imperial-cancel]").forEach(b=>b.onclick=cancelImperialDecision);
+  root.querySelectorAll("[data-histdecision]").forEach(b=>b.onclick=()=>executeHistoricalDecision(b.dataset.histdecision));
 }
 
 /* ===== 국체 전환(Conversion) 이벤트 ===== */
@@ -2811,9 +3195,9 @@ function nextEvent(s){
   if(succPriority.length)return weightedPick(rng,succPriority);
 
   const h=historical(s).filter(x=>!["hist_capital","hist_hanyang"].includes(x.event.id));
-  const historicalPriority=h.filter(x=>x.weight>=180);
-  if(historicalPriority.length && rng()<.88)return weightedPick(rng,historicalPriority);
-  if(h.length && rng()<.68)return weightedPick(rng,h);
+  const historicalPriority=h.filter(x=>x.weight>=175);
+  if(historicalPriority.length && rng()<.93)return weightedPick(rng,historicalPriority);
+  if(h.length && rng()<.76)return weightedPick(rng,h);
 
   const chains=chainEvents(s);
   if(chains.length)return weightedPick(rng,chains);
@@ -3102,7 +3486,8 @@ function eventHTML(prefix=""){
 function renderSide(){
   const el=document.querySelector("#sideContent");
   if(sideTab==="provinces"){
-    el.innerHTML=`<div class="cardTitle">팔도 현황</div><table><thead><tr><th>도</th><th>인구(만)</th><th>민심</th><th>치안</th><th>군사</th></tr></thead><tbody>${Object.entries(state.provinces).map(([n,p])=>`<tr><td>${n}</td><td>${(p.population/10000).toFixed(1)}</td><td>${Math.round(p.public_support)}</td><td>${Math.round(p.security)}</td><td>${Math.round(p.military)}</td></tr>`).join("")}</tbody></table>`;
+    el.innerHTML=administrativeHTML();
+    bindAdministrativeButtons(el);
   }else if(sideTab==="characters"){
     el.innerHTML=`<div class="report"><b>${headOfStateText(state)}</b><br><span class="small">${state.dynasty.stateName||"조선"} · ${isRepublic(state)?state.dynasty.governmentName:`재위 시작 ${state.dynasty.reignStart}년 · 후계 ${state.dynasty.heir||"미정"}`}${state.dynasty.eraName?` · 연호 ${state.dynasty.eraName}`:""}${state.dynasty.statePath?` · ${STATE_PATH_INFO[state.dynasty.statePath].name}`:""}</span></div>`+
     Object.entries(state.characters).filter(([,c])=>c.alive).slice(0,8).map(([n,c])=>`<div class="charCard"><div class="charTop"><b>${n}</b><span class="small">${c.role||""}</span></div><div class="small">영향력 ${Math.round(c.influence)} · 충성 ${Math.round(c.loyalty)} · 야심 ${Math.round(c.ambition)}</div><div class="bar"><i style="width:${c.influence}%"></i></div></div>`).join("");
@@ -3120,7 +3505,8 @@ function renderSide(){
   }
 }
 function renderMobileSections(){
-  document.querySelector("#mProvinceGrid").innerHTML=Object.entries(state.provinces).map(([n,p])=>`<div class="provinceCard"><h4>${n}</h4><div>인구 ${(p.population/10000).toFixed(1)}만<br>민심 ${Math.round(p.public_support)} · 치안 ${Math.round(p.security)}<br>농업 ${Math.round(p.agriculture)} · 군사 ${Math.round(p.military)}</div></div>`).join("");
+  document.querySelector("#mProvinceGrid").innerHTML=administrativeHTML();
+  bindAdministrativeButtons(document.querySelector("#mProvinceGrid"));
   document.querySelector("#mCharacters").innerHTML=`<div class="report"><b>${state.dynasty.stateName||"조선"} · ${headOfStateText(state)}</b><br><span class="small">${isRepublic(state)?state.dynasty.governmentName:`후계 ${state.dynasty.heir||"미정"}`} · ${state.dynasty.eraName?`연호 ${state.dynasty.eraName} · `:""}${era(state)}</span></div>`+
     Object.entries(state.characters).filter(([,c])=>c.alive).map(([n,c])=>`<div class="charCard"><div class="charTop"><b>${n}</b><span class="small">${c.role||""}</span></div><div class="small">영향력 ${Math.round(c.influence)} · 충성 ${Math.round(c.loyalty)} · 야심 ${Math.round(c.ambition)}</div><div class="bar"><i style="width:${c.influence}%"></i></div></div>`).join("");
   document.querySelector("#mForeign").innerHTML=diplomacyHTML();
@@ -3173,15 +3559,15 @@ function render(){
   }
   renderSide();renderMobileSections();renderInternal();renderStrategicDecisions();renderMilitary();renderWarHud();
 }
-function persist(){localStorage.setItem("joseon1393_v12",JSON.stringify(state))}
+function persist(){localStorage.setItem("joseon1393_v13",JSON.stringify(state))}
 function saveFile(){
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download=`joseon_v12_${state.date.year}_${state.date.season}.json`;a.click();URL.revokeObjectURL(a.href);
+  a.href=URL.createObjectURL(blob);a.download=`joseon_v13_${state.date.year}_${state.date.season}.json`;a.click();URL.revokeObjectURL(a.href);
 }
 function migrate(s){
   if(!s)return null;
-  if(![5,6,7,8,9,10,11,12].includes(s.version))return null;
-  s.version=12;
+  if(![5,6,7,8,9,10,11,12,13].includes(s.version))return null;
+  s.version=13;
   if(!s.pathScores)s.pathScores={council:0,royal:0,maritime:0,northern:0};
   if(typeof s.joseon.external_population!=="number")s.joseon.external_population=0;
   if(!s.war)s.war={active:false,target:"",planKey:"",goal:"",type:"",score:0,exhaustion:0,readiness:55,turns:0,stance:"balanced",actionUsedTurn:-1,prep:null,lastReport:"",history:[],peaceMode:"",peaceSelected:[],enemySurrender:false,enemyDemands:false,stalemate:false};
@@ -3197,7 +3583,6 @@ function migrate(s){
   if(!s.dynasty.governmentName)s.dynasty.governmentName=s.dynasty.regime==="republic"?"의정공화정":"왕정";
   if(typeof s.dynasty.successionCount!=="number")s.dynasty.successionCount=0;
 
-  // Migrate generic old Jurchen faction into historically separated northern groups.
   const oldJ=s.factions?.["여진 제부"];
   if(oldJ){
     if(!s.factions["오도리부"])s.factions["오도리부"]={power:Math.max(18,oldJ.power*.58),relation:Math.max(48,oldJ.relation+15),tension:Math.max(10,oldJ.tension-20),stability:Math.max(42,oldJ.stability+10),aggression:24,status:"independent",culture:"여진",region:"두만강 중류·오음회"};
@@ -3231,11 +3616,13 @@ function migrate(s){
     s.strategicDecisions.imperialDraft.open=false;
   }
   if(!Array.isArray(s.territorialHoldings))s.territorialHoldings=[];
+  for(const h of s.territorialHoldings)normalizeHolding(h);
+  if(!s.adminActions)s.adminActions={};
   return s;
 }
 function loadFile(file){
   const r=new FileReader();
-  r.onload=()=>{try{const x=migrate(JSON.parse(r.result));if(!x)throw Error();state=x;if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);persist();render();toast("저장 파일을 불러왔습니다.")}catch(e){console.error(e);toast("V5~V12 저장 파일이 아닙니다.")}};
+  r.onload=()=>{try{const x=migrate(JSON.parse(r.result));if(!x)throw Error();state=x;if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);persist();render();toast("저장 파일을 불러왔습니다.")}catch(e){console.error(e);toast("V5~V13 저장 파일이 아닙니다.")}};
   r.readAsText(file);
 }
 
@@ -3255,6 +3642,7 @@ document.querySelector("#loadInput").onchange=e=>{if(e.target.files[0])loadFile(
 
 let state;
 try{
+  const v13=localStorage.getItem("joseon1393_v13");
   const v12=localStorage.getItem("joseon1393_v12");
   const v11=localStorage.getItem("joseon1393_v11");
   const v10=localStorage.getItem("joseon1393_v10");
@@ -3263,7 +3651,7 @@ try{
   const v7=localStorage.getItem("joseon1393_v7");
   const v6=localStorage.getItem("joseon1393_v6");
   const v5=localStorage.getItem("joseon1393_v5");
-  state=migrate(JSON.parse(v12||v11||v10||v9||v8||v7||v6||v5))||newGame();
+  state=migrate(JSON.parse(v13||v12||v11||v10||v9||v8||v7||v6||v5))||newGame();
 }catch{state=newGame()}
 if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);
 recompute(state);render();

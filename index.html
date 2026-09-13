@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#172019">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>조선 1393 · 대체역사 시뮬레이터 V10</title>
+<title>조선 1393 · 대체역사 시뮬레이터 V12</title>
 <style>
 :root{
   --bg:#101712;
@@ -319,6 +319,31 @@ th{font-weight:700;color:#766f61}
 .peaceTerm b{font-size:12px}
 .peaceTerm p{margin:4px 0 0;font-size:10px;line-height:1.45;color:#756e61}
 
+.annexBadge{
+  display:inline-block;padding:3px 7px;border-radius:999px;background:#7d332e;color:#fff;
+  font-size:10px;font-weight:850;margin-left:5px
+}
+.subjectBadge{
+  display:inline-block;padding:3px 7px;border-radius:999px;background:#796c43;color:#fff;
+  font-size:10px;font-weight:850;margin-left:5px
+}
+.holdingsBox{
+  margin:10px 0;padding:10px 12px;border-radius:12px;background:#eee5d2;border:1px solid #cdbb92;
+  font-size:11px;color:#625a4c;line-height:1.65
+}
+.imperialDecision{
+  border:2px solid #a78643;background:linear-gradient(145deg,#fff8e7,#eee0bc);
+  box-shadow:0 8px 20px rgba(87,67,27,.10)
+}
+.imperialDecision h3{font-size:17px}
+.imperialChoiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}
+.imperialChoice{
+  border:1px solid #bca878;background:#fffdf7;border-radius:10px;padding:9px;font-size:11px;font-weight:800;color:#4c4435
+}
+.imperialChoice.active{background:#6d5528;color:white;border-color:#6d5528}
+.eraGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:7px}
+
+
 @media(max-width:900px){
   .warHud{margin:0 0 11px}
   .warActions{grid-template-columns:1fr 1fr}
@@ -574,9 +599,9 @@ function newGame(){
     "함길":{population:510000,tax:34,public_support:53,security:45,agriculture:39,military:67,development:34}
   };
   const s={
-    version:10,seed:Math.floor(Math.random()*900000000)+1,turn:0,date:{year:1393,season:"봄"},
+    version:12,seed:Math.floor(Math.random()*900000000)+1,turn:0,date:{year:1393,season:"봄"},
     dynasty:{ruler:"태조 이성계",reignStart:1392,heir:"이방석",line:"founding",prestige:62,stateName:"조선",sovereignTitle:"왕",eraName:"",imperial:false,statePath:"",statePathLevel:0,regime:"monarchy",governmentName:"왕정",successionCount:0},
-    joseon:{population:0,national_power:46,treasury:54,military:57,royal_authority:58,public_support:60,administration:47,technology:32,diplomacy:43,food:58,stability:61,corruption:39,commerce:26,navy:42,health:44,culture:38},
+    joseon:{population:0,external_population:0,national_power:46,treasury:54,military:57,royal_authority:58,public_support:60,administration:47,technology:32,diplomacy:43,food:58,stability:61,corruption:39,commerce:26,navy:42,health:44,culture:38},
     provinces,
     characters:{
       "태조 이성계":{influence:95,loyalty:100,ambition:45,alive:true,age:58,role:"국왕"},
@@ -589,12 +614,15 @@ function newGame(){
       "권근":{influence:40,loyalty:73,ambition:35,alive:true,age:41,role:"유학자"}
     },
     factions:{
-      "명":{power:95,relation:40,tension:28,stability:84,aggression:25},
-      "북원":{power:58,relation:18,tension:42,stability:46,aggression:56},
-      "여진 제부":{power:42,relation:34,tension:43,stability:39,aggression:49},
-      "무로마치 막부":{power:63,relation:34,tension:29,stability:59,aggression:31},
-      "대마도 소씨":{power:24,relation:31,tension:52,stability:52,aggression:58},
-      "류큐 중산":{power:19,relation:45,tension:8,stability:58,aggression:12}
+      "명":{power:95,relation:40,tension:28,stability:84,aggression:25,status:"independent"},
+      "북원":{power:58,relation:18,tension:42,stability:46,aggression:56,status:"independent"},
+      "오도리부":{power:24,relation:58,tension:18,stability:56,aggression:22,status:"independent",culture:"여진",region:"두만강 중류·오음회"},
+      "오랑캐부":{power:34,relation:25,tension:49,stability:44,aggression:54,status:"independent",culture:"여진",region:"압록강·파저강 및 건주 방면"},
+      "우디캐 제부":{power:30,relation:20,tension:53,stability:37,aggression:59,status:"independent",culture:"여진",region:"만주 내지·두만강 북방"},
+      "모련부":{power:19,relation:31,tension:41,stability:42,aggression:47,status:"independent",culture:"여진",region:"두만강 중류·해란강"},
+      "무로마치 막부":{power:63,relation:34,tension:29,stability:59,aggression:31,status:"independent"},
+      "대마도 소씨":{power:24,relation:31,tension:52,stability:52,aggression:58,status:"independent"},
+      "류큐 중산":{power:19,relation:45,tension:8,stability:58,aggression:12,status:"independent"}
     },
     flags:{capital:"개경"},
     pathScores:{council:0,royal:0,maritime:0,northern:0},
@@ -606,7 +634,8 @@ function newGame(){
     crisis:{rebellionStage:0,revoltStrength:0,republicanMomentum:0,lastRevoltYear:0},
     diplomacyState:{cooldowns:{},lastAction:"",lastActionTurn:-1},
     fiscal:{taxPolicy:"normal",lastRevenue:0,lastBaseRevenue:0,lastBonusRevenue:0,lastExpense:0,history:[]},
-    strategicDecisions:{projects:{},completed:[]},
+    strategicDecisions:{projects:{},completed:[],imperialDraft:{open:false,stateName:"대한국",eraName:"건흥"}},
+    territorialHoldings:[],
     recentCategories:[],recentIds:[],fired:[],chronicle:[],foreign_actions:[],chains:{},
     last_result:"",current_event:null,game_over:false,game_over_reason:""
   };
@@ -614,7 +643,7 @@ function newGame(){
 }
 function recompute(s){
   const ps=Object.values(s.provinces),j=s.joseon;
-  j.population=Math.round(ps.reduce((a,p)=>a+p.population,0));
+  j.population=Math.round(ps.reduce((a,p)=>a+p.population,0)+(j.external_population||0));
   const avg=k=>ps.reduce((a,p)=>a+p[k],0)/ps.length;
   const popScore=clamp((j.population/5200000)*50);
   const economy=clamp(j.treasury*.38+avg("tax")*.18+avg("agriculture")*.15+j.commerce*.14+j.food*.10+j.health*.05);
@@ -723,6 +752,151 @@ function historical(s){
     }
     push(180,makeEvent("hist_settlement","왕위계승","새 권력 질서를 정하다",desc,chs,["대체역사","왕실"]));
   }
+
+  if(y>=1403&&y<=1404&&!s.flags.hist_gyemija){
+    push(185,makeEvent("hist_gyemija","과학","계미자와 주자소",
+      "태종대 조정에서 금속활자를 새로 주조해 서적 인쇄 능력을 높이자는 논의가 본격화되었다. 활자 제작에는 적지 않은 재정과 기술 인력이 필요하다.",
+      [
+        choice("국가 재정을 투입해 계미자를 주조한다.",{joseon:{treasury:-5,technology:6,administration:3,culture:3}},{hist_gyemija:true},"금속활자 발전"),
+        choice("종친과 공신에게 비용을 분담하게 한다.",{joseon:{treasury:-2,technology:5,royal_authority:-1,culture:2}},{hist_gyemija:true},"국고 부담 감소"),
+        choice("목판 인쇄를 유지하며 투자를 늦춘다.",{joseon:{treasury:2,technology:-1}},{hist_gyemija:true},"보수적 선택")
+      ],["실제 역사","1403년"],
+      {title:"실제 역사",quote:"1403년 태종대에 계미자가 주조되었다.",note:"게임에서는 투자 방식과 규모를 선택할 수 있다."}
+    ));
+  }
+  if(y>=1407&&y<=1408&&!s.flags.hist_inbo){
+    push(175,makeEvent("hist_inbo","행정","인보법 실시",
+      "호구와 유민을 정확히 파악하기 위해 여러 집을 묶어 서로 인구와 이동을 신고하게 하는 인보법을 전국적으로 시행하자는 건의가 올라왔다.",
+      [
+        choice("전국에 강력히 시행한다.",{joseon:{administration:6,treasury:3,public_support:-4,royal_authority:3}},{hist_inbo:true},"호구 파악 강화"),
+        choice("도시와 주요 군현부터 단계적으로 실시한다.",{joseon:{administration:4,treasury:2,public_support:-1}},{hist_inbo:true},"점진 시행"),
+        choice("향촌의 반발을 우려해 보류한다.",{joseon:{public_support:3,administration:-2}},{hist_inbo:true},"민심 우선")
+      ],["실제 역사","1407년"],
+      {title:"실제 역사",quote:"인보법은 1407년 제정되어 전국적으로 시행되었다.",note:"호적·인구동태 파악을 위한 제도였으나 실효성 문제도 있었다."}
+    ));
+  }
+  if(y>=1410&&y<=1411&&!s.flags.hist_moryeon){
+    push(195,makeEvent("hist_moryeon","북방","모련 방면의 군사 충돌",
+      "두만강 일대의 습격과 변경 불안이 커지자 모련 계열 여진 세력을 군사적으로 압박하자는 주장이 힘을 얻고 있다.",
+      [
+        choice("모련부에 대한 정벌 준비를 명한다.",{joseon:{military:3,treasury:-3},factions:{"모련부":{tension:15,relation:-8}}},{hist_moryeon:true},"군사 행동 명분 강화"),
+        choice("교역소와 회유책으로 갈등을 낮춘다.",{joseon:{diplomacy:4,commerce:2},factions:{"모련부":{relation:10,tension:-8}}},{hist_moryeon:true},"회유"),
+        choice("오도리부를 완충세력으로 활용한다.",{joseon:{diplomacy:3},factions:{"오도리부":{relation:7},"모련부":{stability:-4}}},{hist_moryeon:true},"간접 견제")
+      ],["실제 역사","1410년"],
+      {title:"실제 역사",quote:"태종 10년 조선은 모련 방면 여진 세력에 대한 정벌을 단행했다.",note:"게임에서는 직접 전쟁은 군사 메뉴에서 시작하며, 이 사건은 역사적 군사 긴장을 형성한다."}
+    ));
+  }
+  if(y>=1413&&y<=1414&&!s.flags.hist_hopae){
+    push(190,makeEvent("hist_hopae","행정","호패법의 시행",
+      "16세 이상 남성에게 신분과 거주 정보를 적은 호패를 지니게 하여 호구·군역을 파악하자는 정책이 추진되고 있다.",
+      [
+        choice("호패사목을 반포하고 전국적으로 시행한다.",{joseon:{administration:7,treasury:4,military:2,public_support:-5,royal_authority:4}},{hist_hopae:true},"중앙집권 강화"),
+        choice("군역 대상자부터 제한적으로 시행한다.",{joseon:{administration:4,military:2,public_support:-2}},{hist_hopae:true},"제한 시행"),
+        choice("민간 반발을 이유로 보류한다.",{joseon:{public_support:4,royal_authority:-2}},{hist_hopae:true},"민심 우선")
+      ],["실제 역사","1413년"],
+      {title:"실제 역사",quote:"1413년 태종은 호패사목을 제정·반포하고 호패법을 시행했다.",note:"실제 제도는 이후 중단과 재시행을 반복했다."}
+    ));
+  }
+  if(y>=1414&&y<=1415&&!s.flags.hist_six_direct){
+    push(180,makeEvent("hist_six_direct","조정","육조직계제",
+      "의정부를 거치지 않고 육조가 국왕에게 직접 국정을 보고하는 체제로 바꾸자는 논의가 본격화되었다.",
+      [
+        choice("육조직계제를 강하게 시행한다.",{joseon:{royal_authority:7,administration:4,stability:-1},pathScores:{royal:5}},{hist_six_direct:true},"왕권 강화"),
+        choice("의정부의 조정 기능을 일부 남긴다.",{joseon:{royal_authority:3,administration:5,stability:3},pathScores:{council:2,royal:2}},{hist_six_direct:true},"절충"),
+        choice("의정부 중심 체제를 유지한다.",{joseon:{administration:5,royal_authority:-4},pathScores:{council:5}},{hist_six_direct:true},"재상정치")
+      ],["실제 역사","1414년"],
+      {title:"실제 역사",quote:"태종은 1414년 육조직계제를 시행해 왕권과 중앙집권을 강화했다.",note:"게임에서는 국가 진화 노선과 연결된다."}
+    ));
+  }
+  if(y>=1420&&y<=1421&&!s.flags.hist_jiphyeon){
+    push(195,makeEvent("hist_jiphyeon","학문","집현전의 정비",
+      "젊고 유능한 문신을 궁중 학술기관에 모아 경전·역사 연구와 국왕 자문을 맡기자는 계획이 추진되고 있다.",
+      [
+        choice("집현전을 국가 학술의 중심으로 키운다.",{joseon:{treasury:-4,technology:5,culture:7,administration:4}},{hist_jiphyeon:true},"문치 강화"),
+        choice("정책 연구 기능을 중심으로 운영한다.",{joseon:{treasury:-3,administration:7,technology:3}},{hist_jiphyeon:true},"정책기관화"),
+        choice("비용을 줄이고 소규모 자문기관으로 둔다.",{joseon:{treasury:2,culture:2}},{hist_jiphyeon:true},"축소 운영")
+      ],["실제 역사","1420년"],
+      {title:"실제 역사",quote:"세종 2년인 1420년 집현전이 실질적인 학술·자문기관으로 정비되었다.",note:"고전 연구와 인재 양성, 국왕 자문을 담당했다."}
+    ));
+  }
+  if(y>=1423&&y<=1424&&!s.flags.hist_odori_return){
+    push(185,makeEvent("hist_odori_return","북방","오도리부의 귀환",
+      "명과 북방 정세 변화 속에서 오도리부 세력이 다시 두만강 중류의 옛 근거지로 돌아오려 한다. 이들을 우호적 완충세력으로 활용할 수 있다.",
+      [
+        choice("귀환을 허용하고 식량·교역을 지원한다.",{joseon:{treasury:-3,diplomacy:5},factions:{"오도리부":{relation:15,tension:-8,stability:6}}},{hist_odori_return:true},"우호적 완충세력"),
+        choice("귀환은 허용하되 군진의 감시 아래 둔다.",{joseon:{military:2,diplomacy:2},factions:{"오도리부":{relation:5,tension:2}}},{hist_odori_return:true},"통제"),
+        choice("국경 불안을 이유로 귀환을 거절한다.",{joseon:{stability:2},factions:{"오도리부":{relation:-12,tension:10}}},{hist_odori_return:true},"갈등 증가")
+      ],["실제 역사","1423년"],
+      {title:"실제 역사",quote:"1423년 퉁멍거티무르는 오도리족을 이끌고 두만강 중류의 옛 근거지로 돌아왔다.",note:"조선은 오도리 세력을 북방 관계에서 중요한 완충세력으로 활용하려 했다."}
+    ));
+  }
+  if(y>=1426&&y<=1427&&!s.flags.hist_three_ports){
+    push(180,makeEvent("hist_three_ports","상업","삼포 개항",
+      "대마도와 일본 상인의 교역을 통제하면서도 합법적인 통로를 열기 위해 부산포·내이포·염포의 개항이 논의되고 있다.",
+      [
+        choice("삼포를 열고 무역을 공식화한다.",{joseon:{commerce:7,treasury:4,diplomacy:4},factions:{"대마도 소씨":{relation:10,tension:-8}}},{hist_three_ports:true},"교역 확대"),
+        choice("부산포만 제한적으로 허용한다.",{joseon:{commerce:4,treasury:2},factions:{"대마도 소씨":{relation:4,tension:-3}}},{hist_three_ports:true},"제한 개항"),
+        choice("왜구 위험을 이유로 개항을 거부한다.",{joseon:{navy:2},factions:{"대마도 소씨":{relation:-7,tension:7}}},{hist_three_ports:true},"해양 긴장")
+      ],["실제 역사","1426년"],
+      {title:"실제 역사",quote:"1426년 조선은 부산포·내이포·염포의 삼포를 개항했다.",note:"대마도와의 통교·무역을 제도권 안에서 관리하려는 조치였다."}
+    ));
+  }
+  if(y>=1428&&y<=1430&&!s.flags.hist_tongsinsa){
+    push(170,makeEvent("hist_tongsinsa","외교","일본에 통신사를 보내다",
+      "무로마치 막부와의 관계를 안정시키고 일본 정세를 파악하기 위해 공식 사절단을 파견하자는 논의가 올라왔다.",
+      [
+        choice("대규모 통신사를 파견한다.",{joseon:{treasury:-4,diplomacy:7,culture:3},factions:{"무로마치 막부":{relation:10,tension:-5}}},{hist_tongsinsa:true},"교린 외교 강화"),
+        choice("소규모 사절만 보낸다.",{joseon:{treasury:-2,diplomacy:4},factions:{"무로마치 막부":{relation:5}}},{hist_tongsinsa:true},"비용 절감"),
+        choice("대마도를 통해 간접 교섭한다.",{joseon:{commerce:2,diplomacy:2},factions:{"대마도 소씨":{relation:5}}},{hist_tongsinsa:true},"간접 외교")
+      ],["실제 역사","1429년"],
+      {title:"실제 역사",quote:"1428년 말 박서생이 통신사로 임명되어 1429년 일본에 파견되었다.",note:"조선 전기 통신사 외교의 중요한 사례다."}
+    ));
+  }
+  if(y>=1433&&y<=1434&&!s.flags.hist_pajeo){
+    push(205,makeEvent("hist_pajeo","북방","파저강 정벌과 4군 개척",
+      "압록강 지류 파저강 일대 건주 계열 세력의 위협이 커졌다. 조정에서는 군사 원정과 함께 압록강 방면에 군현과 성을 설치하자는 주장이 강해졌다.",
+      [
+        choice("대규모 원정과 군진 설치를 추진한다.",{joseon:{treasury:-8,military:6},provinces:{"평안":{development:5,military:6,population:18000}},factions:{"오랑캐부":{power:-7,tension:10}}},{hist_pajeo:true},"4군 개척 가속"),
+        choice("정벌은 하되 점령지 확대는 신중히 한다.",{joseon:{treasury:-5,military:4},factions:{"오랑캐부":{power:-4,tension:4}}},{hist_pajeo:true},"제한 원정"),
+        choice("외교와 귀부 정책을 우선한다.",{joseon:{diplomacy:5,commerce:2},factions:{"오랑캐부":{relation:8,tension:-6}}},{hist_pajeo:true},"회유")
+      ],["실제 역사","1433년"],
+      {title:"실제 역사",quote:"1433년 세종은 파저강 일대 건주 세력에 대한 정벌을 단행했고 북방 4군 개척이 이어졌다.",note:"게임에서는 이후 영토 확장·전쟁 결정과 연결된다."}
+    ));
+  }
+  if(y>=1434&&y<=1435&&!s.flags.hist_gapinja){
+    push(170,makeEvent("hist_gapinja","과학","갑인자 주조",
+      "기존 금속활자의 인쇄 효율을 크게 개선할 새로운 활자 제작이 추진되고 있다.",
+      [
+        choice("갑인자 주조에 국가 역량을 집중한다.",{joseon:{treasury:-4,technology:7,culture:5,administration:3}},{hist_gapinja:true},"인쇄기술 발전"),
+        choice("기존 경자자를 개량하는 수준에서 마친다.",{joseon:{treasury:-2,technology:4,culture:2}},{hist_gapinja:true},"절충"),
+        choice("북방 군비를 우선하고 활자 개량은 미룬다.",{joseon:{military:2,technology:-1}},{hist_gapinja:true},"군사 우선")
+      ],["실제 역사","1434년"],
+      {title:"실제 역사",quote:"1434년 세종대에 갑인자가 주조되어 금속활자 인쇄 효율이 크게 향상되었다.",note:"계미자·경자자에 이은 조선 초기 금속활자 발전의 중요한 단계다."}
+    ));
+  }
+  if(y>=1437&&y<=1438&&!s.flags.hist_pajeo2){
+    push(180,makeEvent("hist_pajeo2","북방","파저강 2차 원정",
+      "북방 정세가 다시 불안해지자 압록강 너머 건주 세력에 대한 추가 정벌과 군진 강화가 논의되고 있다.",
+      [
+        choice("2차 원정을 단행해 압박을 굳힌다.",{joseon:{treasury:-6,military:5},factions:{"오랑캐부":{power:-6,tension:8}},provinces:{"평안":{security:6}}},{hist_pajeo2:true},"북방 우위"),
+        choice("군진 방어만 강화한다.",{joseon:{treasury:-4,military:3},provinces:{"평안":{security:8}}},{hist_pajeo2:true},"방어 강화"),
+        choice("오도리·모련 세력을 활용해 간접 견제한다.",{joseon:{diplomacy:5},factions:{"오도리부":{relation:5},"모련부":{relation:3},"오랑캐부":{stability:-5}}},{hist_pajeo2:true},"세력 균형")
+      ],["실제 역사","1437년"],
+      {title:"실제 역사",quote:"1437년 조선은 파저강 일대에 대한 2차 정벌을 실시했다.",note:"이후 4군 완성과 압록강 국경 확립 과정이 이어졌다."}
+    ));
+  }
+  if(y>=1443&&y<=1444&&!s.flags.hist_gyehae){
+    push(195,makeEvent("hist_gyehae","외교","계해약조",
+      "대마도와의 교역을 안정적으로 관리하기 위해 세견선과 교역 규모를 정한 정식 약조를 체결하자는 논의가 올라왔다.",
+      [
+        choice("계해약조를 체결해 통교를 제도화한다.",{joseon:{commerce:6,diplomacy:6,treasury:3},factions:{"대마도 소씨":{relation:12,tension:-10}}},{hist_gyehae:true},"대마도 교역 안정"),
+        choice("세견선 수를 더 엄격하게 제한한다.",{joseon:{commerce:3,navy:2},factions:{"대마도 소씨":{relation:2,tension:-3}}},{hist_gyehae:true},"통제 강화"),
+        choice("대마도에 더 많은 양보를 요구한다.",{joseon:{royal_authority:2},factions:{"대마도 소씨":{relation:-5,tension:5}}},{hist_gyehae:true},"강경 협상")
+      ],["실제 역사","1443년"],
+      {title:"실제 역사",quote:"1443년 조선과 대마도는 세견선과 무역 조건을 규정한 계해약조를 맺었다.",note:"대마도와의 교역 질서를 제도화한 대표적 조약이다."}
+    ));
+  }
+
   if(y>=1418&&y<=1421&&!s.flags.tsushima_policy){
     push(140,makeEvent("hist_tsushima","해군","대마도와 왜구 문제",
       "남해안의 약탈과 대마도 세력의 통제 문제를 두고 조정에서 강경론이 힘을 얻고 있다. 군사 원정은 위험하지만 성공하면 해상 질서를 바꿀 수 있다.",
@@ -736,8 +910,8 @@ function historical(s){
     push(135,makeEvent("hist_north","북방","압록강·두만강의 국경선",
       "북방 여진 세력의 이동과 귀부가 이어지며 조선이 어디까지 실효 지배를 넓힐 것인지가 핵심 쟁점이 되었다. 군진 설치는 장기적으로 국경선을 바꿀 수 있다.",
       [
-        choice("성과 군진을 설치해 적극적으로 북방을 개척한다.",{joseon:{treasury:-10,military:6},provinces:{"평안":{military:8,development:4,population:30000},"함길":{military:8,development:4,population:30000}},factions:{"여진 제부":{tension:12}}},{northern_policy:"expansion"},"영토 확장"),
-        choice("귀부와 교역을 확대해 완충지대를 만든다.",{joseon:{diplomacy:5,commerce:3},factions:{"여진 제부":{relation:12,tension:-8}}},{northern_policy:"buffer"},"유연한 국경"),
+        choice("성과 군진을 설치해 적극적으로 북방을 개척한다.",{joseon:{treasury:-10,military:6},provinces:{"평안":{military:8,development:4,population:30000},"함길":{military:8,development:4,population:30000}},factions:{"오랑캐부":{tension:10},"우디캐 제부":{tension:5},"모련부":{tension:4}}},{northern_policy:"expansion"},"영토 확장"),
+        choice("귀부와 교역을 확대해 완충지대를 만든다.",{joseon:{diplomacy:5,commerce:3},factions:{"오도리부":{relation:8,tension:-5},"오랑캐부":{relation:5,tension:-4},"모련부":{relation:5,tension:-4}}},{northern_policy:"buffer"},"유연한 국경"),
         choice("현 국경선을 지키며 무리한 확장은 피한다.",{joseon:{treasury:-4,military:3},provinces:{"평안":{security:6},"함길":{security:6}}},{northern_policy:"defense"},"안정적 방어")
       ],["실제 역사","북방"]));
   }
@@ -1063,16 +1237,49 @@ const WAR_PLANS={
     ],
     cost:{treasury:5,diplomacy:2}
   },
-  jurchen:{
-    name:"여진 토벌전",target:"여진 제부",goal:"북방 군진 안정과 여진 세력 굴복",type:"land",prepTurns:3,risk:"보통",
-    desc:"함길도 국경을 위협하는 여진 세력을 상대로 군진과 기병을 동원한다.",
+  odori:{
+    name:"오도리부 군사 압박",target:"오도리부",goal:"두만강 중류의 조선 영향력 강화",type:"land",prepTurns:2,risk:"낮음",
+    desc:"조선과 비교적 우호적인 오도리부를 군사적으로 굴복시키는 선택이다. 외교적 해결보다 민심·외교 비용이 크다.",
+    reqs:s=>[
+      [s.date.year>=1395,"1395년 이후"],
+      [s.joseon.military>=52,"군사력 52 이상"],
+      [s.joseon.treasury>=32,"재정 32 이상"],
+      [s.factions["오도리부"].tension>=38,"오도리 긴장 38 이상"]
+    ],
+    cost:{treasury:4,diplomacy:3}
+  },
+  orangke:{
+    name:"오랑캐부 정벌",target:"오랑캐부",goal:"압록강·파저강 방면의 위협 제거",type:"land",prepTurns:3,risk:"보통",
+    desc:"조선과 충돌이 잦은 오랑캐계 세력을 상대로 북방 군진의 안전과 영향력 확대를 노린다.",
     reqs:s=>[
       [s.date.year>=1396,"1396년 이후"],
       [s.joseon.military>=58,"군사력 58 이상"],
       [s.joseon.treasury>=38,"재정 38 이상"],
-      [s.factions["여진 제부"].tension>=42,"여진 긴장 42 이상"]
+      [s.factions["오랑캐부"].tension>=42,"오랑캐부 긴장 42 이상"]
     ],
     cost:{treasury:6,diplomacy:2}
+  },
+  udige:{
+    name:"우디캐 토벌",target:"우디캐 제부",goal:"두만강 북방 약탈 세력 제압",type:"land",prepTurns:3,risk:"높음",
+    desc:"만주 내지와 북방 산림에 분산된 우디캐 세력에 원정을 감행한다. 장거리 보급 부담이 크다.",
+    reqs:s=>[
+      [s.date.year>=1400,"1400년 이후"],
+      [s.joseon.military>=62,"군사력 62 이상"],
+      [s.joseon.treasury>=42,"재정 42 이상"],
+      [s.factions["우디캐 제부"].tension>=45,"우디캐 긴장 45 이상"]
+    ],
+    cost:{treasury:7,diplomacy:2}
+  },
+  moryeon:{
+    name:"모련부 정벌",target:"모련부",goal:"두만강 중류·해란강 방면 안정",type:"land",prepTurns:2,risk:"보통",
+    desc:"두만강 중류 모련 계열 세력을 압박해 변경 습격과 세력 확대를 차단한다.",
+    reqs:s=>[
+      [s.date.year>=1408,"1408년 이후"],
+      [s.joseon.military>=56,"군사력 56 이상"],
+      [s.joseon.treasury>=35,"재정 35 이상"],
+      [s.factions["모련부"].tension>=38,"모련부 긴장 38 이상"]
+    ],
+    cost:{treasury:5,diplomacy:2}
   },
   northern_yuan:{
     name:"북원 압박전",target:"북원",goal:"북방 위협 제거와 초원 세력 약화",type:"land",prepTurns:4,risk:"높음",
@@ -1096,6 +1303,31 @@ const WAR_PLANS={
       [s.factions["명"].tension>=55 || s.dynasty.imperial,"명 긴장 55+ 또는 황제국"]
     ],
     cost:{treasury:12,diplomacy:6}
+  },
+  japan:{
+    name:"일본 원정",target:"무로마치 막부",goal:"일본 서부에 대한 군사적 우위 확보",type:"naval",prepTurns:5,risk:"극단적",
+    desc:"대규모 수군과 원정군을 동원해 일본 본토에 개입한다. 해상보급과 장기전 위험이 매우 높다.",
+    reqs:s=>[
+      [s.date.year>=1405,"1405년 이후"],
+      [s.joseon.navy>=68,"수군 68 이상"],
+      [s.joseon.military>=65,"군사력 65 이상"],
+      [s.joseon.national_power>=62,"국력 62 이상"],
+      [s.joseon.treasury>=55,"재정 55 이상"],
+      [s.factions["무로마치 막부"].tension>=55,"막부 긴장 55 이상"]
+    ],
+    cost:{treasury:12,diplomacy:5}
+  },
+  ryukyu:{
+    name:"류큐 정벌",target:"류큐 중산",goal:"동중국해 해상거점 장악",type:"naval",prepTurns:4,risk:"높음",
+    desc:"류큐 중산을 상대로 원거리 해상원정을 실시한다. 외교·무역으로 해결할 수도 있는 국가를 침공하는 선택이다.",
+    reqs:s=>[
+      [s.date.year>=1400,"1400년 이후"],
+      [s.joseon.navy>=58,"수군 58 이상"],
+      [s.joseon.military>=55,"군사력 55 이상"],
+      [s.joseon.treasury>=45,"재정 45 이상"],
+      [s.factions["류큐 중산"].tension>=45,"류큐 긴장 45 이상"]
+    ],
+    cost:{treasury:8,diplomacy:5}
   }
 };
 
@@ -1163,30 +1395,59 @@ function setWarAction(action){
   w.actionUsedTurn=state.turn;persist();render();
 }
 
+
+function addHolding(s,name,from,pop=0,note=""){
+  if(!Array.isArray(s.territorialHoldings))s.territorialHoldings=[];
+  if(s.territorialHoldings.some(x=>x.name===name))return;
+  s.territorialHoldings.push({name,from,year:s.date.year,population:pop,note});
+  s.joseon.external_population=(s.joseon.external_population||0)+pop;
+}
+function annexFaction(s,target,territory,pop=0){
+  const f=s.factions[target];if(!f)return;
+  f.status="annexed";f.power=0;f.tension=0;f.relation=100;f.stability=100;f.aggression=0;
+  addHolding(s,territory,target,pop,"완전 병합");
+  s.foreign_actions.push(`${target}의 독립 세력은 소멸하고 ${territory}이(가) 조선에 완전 병합되었다.`);
+}
+function subjectFaction(s,target){
+  const f=s.factions[target];if(!f||f.status==="annexed")return;
+  f.status="subject";f.tension=clamp(Math.min(f.tension,18));f.relation=clamp(Math.max(f.relation,68));f.power=clamp(f.power-8);
+  s.foreign_actions.push(`${target}이 조선의 종속 세력으로 편입되었다.`);
+}
+function peaceTermAvailable(term,s=state){
+  if(term.minScore!=null&&s.war.score<term.minScore)return false;
+  if(term.minTurns!=null&&s.war.turns<term.minTurns)return false;
+  if(term.requires&& !term.requires(s))return false;
+  return true;
+}
+
 const PEACE_TERMS={
   tsushima:[
     {id:"anti_piracy",name:"왜구 근절 서약",cost:1,desc:"대마도 세력이 왜구 단속 책임을 지고 조선 연해의 약탈을 금지한다.",apply:s=>{s.provinces["경상"].security=clamp(s.provinces["경상"].security+7);s.factions["대마도 소씨"].tension=clamp(s.factions["대마도 소씨"].tension-18);s.flags.tsushima_anti_piracy=true}},
     {id:"trade",name:"통제무역 확대",cost:1,desc:"조선이 허가한 포구와 조건 아래에서만 교역하도록 한다.",apply:s=>{s.joseon.commerce=clamp(s.joseon.commerce+5);s.factions["대마도 소씨"].relation=clamp(s.factions["대마도 소씨"].relation+5);s.flags.tsushima_trade=true}},
     {id:"tribute",name:"세견·공납 의무 강화",cost:2,desc:"대마도 세력에 정기적인 공납과 사절 파견 의무를 부과한다.",apply:s=>{s.joseon.treasury=clamp(s.joseon.treasury+8);s.joseon.royal_authority=clamp(s.joseon.royal_authority+2);s.factions["대마도 소씨"].power=clamp(s.factions["대마도 소씨"].power-3);s.flags.tsushima_tribute=true}},
-    {id:"submission",name:"대마도 종속화",cost:4,desc:"대마도 소씨를 조선의 강한 영향권 아래 두고 군사·외교의 자율성을 제한한다.",apply:s=>{s.joseon.navy=clamp(s.joseon.navy+4);s.joseon.royal_authority=clamp(s.joseon.royal_authority+4);s.factions["대마도 소씨"].power=clamp(s.factions["대마도 소씨"].power-10);s.flags.tsushima_subordinate=true}}
+    {id:"submission",name:"대마도 속국화",cost:3,minScore:60,minTurns:3,desc:"대마도 소씨를 조선의 속국으로 만들어 외교와 군사 자율성을 제한한다.",apply:s=>{s.joseon.navy=clamp(s.joseon.navy+3);s.joseon.royal_authority=clamp(s.joseon.royal_authority+3);subjectFaction(s,"대마도 소씨");s.flags.tsushima_subordinate=true}},
+    {id:"annex",name:"대마도 완전 병합",cost:5,minScore:90,minTurns:5,desc:"대마도 소씨의 독립을 폐지하고 대마도를 조선의 직할 영토로 편입한다. 높은 승점과 장기 점령이 필요하다.",apply:s=>{annexFaction(s,"대마도 소씨","대마도",75000);s.joseon.navy=clamp(s.joseon.navy+5);s.joseon.commerce=clamp(s.joseon.commerce+4);s.joseon.royal_authority=clamp(s.joseon.royal_authority+5);s.flags.tsushima_annexed=true}}
   ],
   jurchen:[
-    {id:"border_peace",name:"국경 약탈 중지",cost:1,desc:"여진 세력이 함길도 변경의 약탈을 중단하도록 강제한다.",apply:s=>{s.provinces["함길"].security=clamp(s.provinces["함길"].security+8);s.factions["여진 제부"].tension=clamp(s.factions["여진 제부"].tension-16);s.flags.jurchen_border_peace=true}},
-    {id:"tribute_trade",name:"귀부·교역 확대",cost:2,desc:"귀부 부족에게 교역을 허용하는 대신 조선에 대한 공납과 복종을 요구한다.",apply:s=>{s.joseon.commerce=clamp(s.joseon.commerce+3);s.factions["여진 제부"].relation=clamp(s.factions["여진 제부"].relation+5);s.provinces["함길"].population+=6000;s.flags.jurchen_tribute=true}},
-    {id:"frontier_posts",name:"군진 전진 배치",cost:2,desc:"승전 지역에 조선의 성과 군진을 설치해 실효 지배를 강화한다.",apply:s=>{s.provinces["함길"].military=clamp(s.provinces["함길"].military+6);s.provinces["함길"].development=clamp(s.provinces["함길"].development+3);s.factions["여진 제부"].power=clamp(s.factions["여진 제부"].power-4);s.flags.northern_posts=true}},
-    {id:"hegemony",name:"여진 제부에 대한 패권",cost:4,desc:"주요 여진 세력의 대외 행동을 조선의 승인 아래 두는 강한 종속관계를 요구한다.",apply:s=>{s.joseon.military=clamp(s.joseon.military+3);s.pathScores.northern+=6;s.factions["여진 제부"].power=clamp(s.factions["여진 제부"].power-10);s.flags.jurchen_subdued=true}}
+    {id:"border_peace",name:"국경 약탈 중지",cost:1,desc:"여진 세력이 함길도 변경의 약탈을 중단하도록 강제한다.",apply:s=>{s.provinces["함길"].security=clamp(s.provinces["함길"].security+8);s.factions["오랑캐부"].tension=clamp(s.factions["오랑캐부"].tension-16);s.flags.jurchen_border_peace=true}},
+    {id:"tribute_trade",name:"귀부·교역 확대",cost:2,desc:"귀부 부족에게 교역을 허용하는 대신 조선에 대한 공납과 복종을 요구한다.",apply:s=>{s.joseon.commerce=clamp(s.joseon.commerce+3);s.factions["오랑캐부"].relation=clamp(s.factions["오랑캐부"].relation+5);s.provinces["함길"].population+=6000;s.flags.jurchen_tribute=true}},
+    {id:"frontier_posts",name:"군진 전진 배치",cost:2,desc:"승전 지역에 조선의 성과 군진을 설치해 실효 지배를 강화한다.",apply:s=>{s.provinces["함길"].military=clamp(s.provinces["함길"].military+6);s.provinces["함길"].development=clamp(s.provinces["함길"].development+3);s.factions["오랑캐부"].power=clamp(s.factions["오랑캐부"].power-4);s.flags.northern_posts=true}},
+    {id:"hegemony",name:"오랑캐부 속국화",cost:4,minScore:75,minTurns:4,desc:"주요 여진 세력을 조선의 종속 세력으로 묶어 독자적인 대외 행동을 제한한다.",apply:s=>{s.joseon.military=clamp(s.joseon.military+3);s.pathScores.northern+=6;subjectFaction(s,"오랑캐부");s.flags.jurchen_subdued=true}},
+    {id:"annex_frontier",name:"두만강 북방 영토 병합",cost:5,minScore:90,minTurns:5,desc:"점령한 북방 거점과 주변 지역을 조선의 직할 영토로 병합한다. 여진 전체를 소멸시키는 것은 아니며 북방 영토가 확장된다.",apply:s=>{addHolding(s,"두만강 북방","오랑캐부",120000,"전쟁 후 직접 병합");s.provinces["함길"].development=clamp(s.provinces["함길"].development+6);s.provinces["함길"].military=clamp(s.provinces["함길"].military+7);s.factions["오랑캐부"].power=clamp(s.factions["오랑캐부"].power-14);s.pathScores.northern+=7;s.flags.northern_annexation=true}}
   ],
   northern_yuan:[
     {id:"cease_raids",name:"북방 침입 중지",cost:1,desc:"북원 세력에게 조선 국경과 여진 지역에 대한 군사 개입을 줄이도록 요구한다.",apply:s=>{s.provinces["평안"].security=clamp(s.provinces["평안"].security+6);s.factions["북원"].tension=clamp(s.factions["북원"].tension-14);s.flags.northern_yuan_ceasefire=true}},
     {id:"horse_trade",name:"말·초원 교역권",cost:1,desc:"군마와 북방 물자의 교역권을 조선에 유리하게 재조정한다.",apply:s=>{s.joseon.commerce=clamp(s.joseon.commerce+3);s.joseon.military=clamp(s.joseon.military+1);s.factions["북원"].relation=clamp(s.factions["북원"].relation+4);s.flags.steppe_trade=true}},
     {id:"hostages",name:"인질·사절 보장",cost:2,desc:"휴전 준수를 위해 유력자의 자제와 사절을 정기적으로 보내도록 한다.",apply:s=>{s.joseon.diplomacy=clamp(s.joseon.diplomacy+4);s.factions["북원"].stability=clamp(s.factions["북원"].stability-4);s.flags.northern_guarantees=true}},
-    {id:"steppe_hegemony",name:"동부 초원 패권 인정",cost:4,desc:"북원이 조선의 동북방 영향권을 인정하도록 강제한다.",apply:s=>{s.joseon.military=clamp(s.joseon.military+4);s.pathScores.northern+=5;s.factions["북원"].power=clamp(s.factions["북원"].power-10);s.flags.steppe_hegemony=true}}
+    {id:"steppe_hegemony",name:"동부 초원 패권 인정",cost:4,minScore:75,minTurns:4,desc:"북원이 조선의 동북방 영향권을 인정하도록 강제한다.",apply:s=>{s.joseon.military=clamp(s.joseon.military+4);s.pathScores.northern+=5;s.factions["북원"].power=clamp(s.factions["북원"].power-10);s.flags.steppe_hegemony=true}},
+    {id:"annex_steppe",name:"동부 초원 영토 병합",cost:5,minScore:95,minTurns:6,desc:"북원의 동부 거점 일부를 조선 영토로 직접 편입한다. 북원 전체 병합이 아니라 점령한 동부 영토의 병합이다.",apply:s=>{addHolding(s,"동부 초원 변경","북원",150000,"전쟁 후 직접 병합");s.factions["북원"].power=clamp(s.factions["북원"].power-15);s.joseon.military=clamp(s.joseon.military+4);s.pathScores.northern+=8;s.flags.eastern_steppe_annexed=true}}
   ],
   ming:[
     {id:"border_settlement",name:"국경 현상 인정",cost:1,desc:"명에게 조선의 북방 군진과 현재 국경 질서를 인정하도록 요구한다.",apply:s=>{s.joseon.diplomacy=clamp(s.joseon.diplomacy+3);s.factions["명"].tension=clamp(s.factions["명"].tension-10);s.flags.ming_border_settlement=true}},
     {id:"trade_concession",name:"대명 통상 특권",cost:2,desc:"조공 이외의 교역과 사행 조건에서 조선에 유리한 양보를 얻는다.",apply:s=>{s.joseon.commerce=clamp(s.joseon.commerce+5);s.joseon.treasury=clamp(s.joseon.treasury+7);s.flags.ming_trade_concession=true}},
     {id:"liaodong",name:"요동 영향권 확보",cost:3,desc:"명군의 전진 배치를 후퇴시키고 요동 일부에 조선의 정치·군사적 영향력을 확보한다.",apply:s=>{s.provinces["평안"].development=clamp(s.provinces["평안"].development+6);s.provinces["평안"].military=clamp(s.provinces["평안"].military+4);s.factions["명"].power=clamp(s.factions["명"].power-6);s.flags.liaodong_influence=true}},
-    {id:"autonomy",name:"조선의 자주 외교권 인정",cost:4,desc:"명의 책봉 질서에 대한 조선의 독자적 외교와 국체 운영을 사실상 인정하게 한다.",apply:s=>{s.joseon.diplomacy=clamp(s.joseon.diplomacy+7);s.joseon.royal_authority=clamp(s.joseon.royal_authority+5);s.factions["명"].relation=clamp(s.factions["명"].relation+7);s.flags.ming_recognized_autonomy=true}}
+    {id:"autonomy",name:"조선의 자주 외교권 인정",cost:4,minScore:75,minTurns:4,desc:"명의 책봉 질서에 대한 조선의 독자적 외교와 국체 운영을 사실상 인정하게 한다.",apply:s=>{s.joseon.diplomacy=clamp(s.joseon.diplomacy+7);s.joseon.royal_authority=clamp(s.joseon.royal_authority+5);s.factions["명"].relation=clamp(s.factions["명"].relation+7);s.flags.ming_recognized_autonomy=true}},
+    {id:"annex_liaodong",name:"요동 영토 병합",cost:5,minScore:95,minTurns:6,desc:"점령한 요동의 핵심 지역을 조선의 직할 영토로 병합한다. 명 전체를 병합하는 것이 아니라 요동 전쟁 목표의 최대 강화조건이다.",apply:s=>{addHolding(s,"요동","명",350000,"전쟁 후 직접 병합");s.provinces["평안"].development=clamp(s.provinces["평안"].development+8);s.provinces["평안"].military=clamp(s.provinces["평안"].military+6);s.factions["명"].power=clamp(s.factions["명"].power-12);s.joseon.royal_authority=clamp(s.joseon.royal_authority+6);s.flags.liaodong_annexed=true}}
   ]
 };
 function peaceBudget(s=state){
@@ -1198,7 +1459,75 @@ function peaceBudget(s=state){
   if(sc>=25)return 1;
   return 0;
 }
-function peaceTermsFor(s=state){return PEACE_TERMS[s.war.planKey]||[]}
+
+function targetTerritoryInfo(target){
+  const map={
+    "대마도 소씨":{partial:"대마도 남부",full:"대마도",partialPop:35000,fullPop:75000,minor:true},
+    "오도리부":{partial:"오음회·두만강 중류",full:"오도리부 영역",partialPop:45000,fullPop:120000,minor:true},
+    "오랑캐부":{partial:"파저강 변경",full:"오랑캐부 세력권",partialPop:90000,fullPop:230000,minor:false},
+    "우디캐 제부":{partial:"두만강 북방 산림",full:"우디캐 제부 영역",partialPop:70000,fullPop:220000,minor:false},
+    "모련부":{partial:"해란강·모련 일대",full:"모련부 영역",partialPop:45000,fullPop:105000,minor:true},
+    "북원":{partial:"동부 초원",full:"북원 정권",partialPop:160000,fullPop:1200000,minor:false},
+    "명":{partial:"요동",full:"명 전역",partialPop:420000,fullPop:6000000,minor:false},
+    "무로마치 막부":{partial:"규슈 북부",full:"일본 열도",partialPop:320000,fullPop:7000000,minor:false},
+    "류큐 중산":{partial:"오키나와 북부",full:"류큐 제도",partialPop:45000,fullPop:130000,minor:true}
+  };
+  return map[target]||{partial:`${target} 변경`,full:`${target} 전역`,partialPop:50000,fullPop:200000,minor:false};
+}
+function tributaryFaction(s,target){
+  const f=s.factions[target];if(!f||f.status==="annexed")return;
+  f.status="tributary";f.statusSince=s.turn;
+  f.relation=clamp(Math.max(f.relation,62));f.tension=clamp(Math.min(f.tension,20));
+  s.foreign_actions.push(`${target}이 조선의 조공국이 되었다.`);
+}
+function genericPeaceTerms(s=state){
+  const target=s.war.target,info=targetTerritoryInfo(target),f=s.factions[target];
+  if(!f)return [];
+  const majorFullReq=st=>{
+    const tf=st.factions[target];
+    if(info.minor)return true;
+    return st.joseon.national_power>=78 && st.joseon.military>=72 && tf.power<=48;
+  };
+  const extremeFullReq=st=>{
+    if(target==="명")return st.joseon.national_power>=90&&st.joseon.military>=86&&st.factions["명"].power<=38;
+    if(target==="무로마치 막부")return st.joseon.national_power>=82&&st.joseon.navy>=78&&st.factions[target].power<=45;
+    return majorFullReq(st);
+  };
+  return [
+    {id:"generic_tributary",name:"조공국화",cost:2,minScore:35,minTurns:2,
+      desc:`${target}의 독립은 유지하되 조선에 정기적으로 조공하고 외교적 우위를 인정하게 한다.`,
+      apply:st=>{tributaryFaction(st,target);st.joseon.diplomacy=clamp(st.joseon.diplomacy+3)}},
+    {id:"generic_subject",name:"속국화",cost:3,minScore:60,minTurns:3,
+      desc:`${target}을 조선의 종속국으로 편입해 외교·군사 자율성을 크게 제한한다.`,
+      apply:st=>{subjectFaction(st,target);st.joseon.royal_authority=clamp(st.joseon.royal_authority+3)}},
+    {id:"generic_partial_annex",name:`일부 영토 합병 — ${info.partial}`,cost:4,minScore:75,minTurns:4,
+      desc:`전쟁에서 점령한 ${info.partial}을 조선의 직할 영토로 편입한다.`,
+      apply:st=>{
+        addHolding(st,info.partial,target,info.partialPop,"강화조약 일부 영토 병합");
+        st.factions[target].power=clamp(st.factions[target].power-13);
+        st.joseon.national_power=clamp(st.joseon.national_power+3);
+        st.joseon.stability=clamp(st.joseon.stability-2);
+      }},
+    {id:"generic_full_annex",name:`전국토 병합 — ${info.full}`,cost:5,minScore:95,minTurns:info.minor?5:7,
+      requires:extremeFullReq,
+      desc:`${target}의 독립정부를 해체하고 ${info.full} 전체를 조선의 영토로 병합한다. 대국은 한 번의 승리만으로는 불가능하며 충분히 약화시켜야 한다.`,
+      apply:st=>{
+        const oldPower=st.factions[target].power;
+        annexFaction(st,target,info.full,info.fullPop);
+        st.joseon.national_power=clamp(st.joseon.national_power+Math.min(15,4+oldPower*.12));
+        st.joseon.royal_authority=clamp(st.joseon.royal_authority+5);
+        st.joseon.stability=clamp(st.joseon.stability-7);
+        st.joseon.administration=clamp(st.joseon.administration-4);
+        st.joseon.corruption=clamp(st.joseon.corruption+3);
+        st.joseon.treasury=clamp(st.joseon.treasury-5);
+      }}
+  ];
+}
+function peaceTermsFor(s=state){
+  const obsolete=new Set(["submission","hegemony","annex","annex_frontier","annex_steppe","annex_liaodong"]);
+  const specific=(PEACE_TERMS[s.war.planKey]||[]).filter(t=>!obsolete.has(t.id));
+  return specific.concat(genericPeaceTerms(s));
+}
 function selectedPeaceCost(s=state){
   const terms=peaceTermsFor(s);
   return (s.war.peaceSelected||[]).reduce((sum,id)=>sum+(terms.find(t=>t.id===id)?.cost||0),0);
@@ -1217,7 +1546,7 @@ function closePeaceNegotiation(){
 }
 function togglePeaceTerm(id){
   if(state.war.peaceMode!=="victory")return;
-  const terms=peaceTermsFor(state),term=terms.find(t=>t.id===id);if(!term)return;
+  const terms=peaceTermsFor(state),term=terms.find(t=>t.id===id);if(!term||!peaceTermAvailable(term,state))return;
   const arr=state.war.peaceSelected||[];
   if(arr.includes(id)){
     state.war.peaceSelected=arr.filter(x=>x!==id);
@@ -1349,10 +1678,11 @@ function peaceNegotiationHTML(){
     <div class="peaceBudget">강화 포인트 ${used}/${budget} 사용 · 남은 포인트 ${remain}</div>
     <div class="small">승점이 높을수록 더 많은 조건을 동시에 요구할 수 있습니다.</div>`;
   for(const t of terms){
-    const sel=(w.peaceSelected||[]).includes(t.id),disabled=!sel&&t.cost>remain;
+    const sel=(w.peaceSelected||[]).includes(t.id),available=peaceTermAvailable(t,state),disabled=!available||(!sel&&t.cost>remain);
+    const need=[];if(t.minScore!=null)need.push(`승점 ${t.minScore}+`);if(t.minTurns!=null)need.push(`${t.minTurns}턴+`);
     h+=`<div class="peaceTerm ${sel?"selected":""} ${disabled?"disabled":""}">
-      <div class="peaceTermTop"><div><b>${t.name}</b><p>${t.desc}</p></div><span class="peaceCost">${t.cost}점</span></div>
-      <div class="decisionActions"><button class="decisionBtn ${sel?"primary":""}" data-peaceterm="${t.id}" ${disabled?"disabled":""}>${sel?"선택 취소":"요구 조건에 추가"}</button></div>
+      <div class="peaceTermTop"><div><b>${t.name}${t.id.includes("annex")?` <span class="annexBadge">병합</span>`:""}</b><p>${t.desc}${need.length?`<br><b>조건:</b> ${need.join(" · ")}`:""}</p></div><span class="peaceCost">${t.cost}점</span></div>
+      <div class="decisionActions"><button class="decisionBtn ${sel?"primary":""}" data-peaceterm="${t.id}" ${disabled?"disabled":""}>${sel?"선택 취소":available?"요구 조건에 추가":"조건 미충족"}</button></div>
     </div>`;
   }
   h+=`<div class="decisionActions" style="margin-top:10px">
@@ -1368,7 +1698,8 @@ function militaryHTML(){
     <div class="milStat"><span>수군</span><b>${Math.round(state.joseon.navy)}</b></div>
     <div class="milStat"><span>전쟁준비도</span><b>${Math.round(state.war.readiness)}</b></div>
   </div>
-  <div class="decisionIntro">전쟁은 <b>준비 → 선전포고 → 전역 진행 → 강화협상</b>으로 끝납니다. 승점이 높을수록 더 강한 강화조건을 요구할 수 있습니다.</div>`;
+  <div class="decisionIntro">전쟁은 <b>준비 → 선전포고 → 전역 진행 → 강화협상</b>으로 끝납니다. 승점이 높을수록 속국화·영토 병합 같은 강한 강화조건을 요구할 수 있습니다.</div>
+  ${state.territorialHoldings?.length?`<div class="holdingsBox"><b>확장 영토</b><br>${state.territorialHoldings.map(x=>`${x.name} (${x.year}년 · ${x.from})`).join(" · ")}</div>`:""}`;
   if(w.active){
     const ours=warStrength(state),enemy=enemyStrength(state),budget=peaceBudget(state);
     h+=`<div class="warPanel"><div class="sectionLabel">진행 중인 전쟁</div><h3>${WAR_PLANS[w.planKey]?.name||w.target}</h3>
@@ -1410,7 +1741,12 @@ function militaryHTML(){
   }
   h+=`<div class="decisionSection">전쟁 계획</div>`;
   for(const [key,p] of Object.entries(WAR_PLANS)){
-    const reqs=p.reqs(state),ok=reqs.every(x=>x[0]),blocked=w.active||!!w.prep;
+    const targetState=state.factions[p.target]?.status||"independent";
+    const reqs=[
+      [targetState==="independent",targetState==="annexed"?"이미 병합된 세력":targetState==="subject"?"이미 조선의 속국":targetState==="tributary"?"이미 조선의 조공국":"독립 세력"],
+      [!state.factions[p.target]?.nonAggression,"불가침 약조가 없음"],
+      ...p.reqs(state)
+    ],ok=reqs.every(x=>x[0]),blocked=w.active||!!w.prep;
     const riskClass=p.risk==="극단적"?"extreme":p.risk==="높음"?"high":"";
     h+=`<div class="decisionCard ${!ok||blocked?"locked":""}">
       <div class="decisionTop"><div class="decisionName">${p.name}</div><span class="decisionRisk ${riskClass}">위험 ${p.risk}</span></div>
@@ -1591,7 +1927,7 @@ function statePathEvents(s){
         choices=[
           choice("북방 개척과 군진 확대를 국가 최우선 전략으로 삼는다.",{joseon:{military:8,treasury:-5,royal_authority:2},provinces:{"함길":{military:6,security:5},"평안":{military:5,security:4}},pathScores:{northern:5}},{adopt_path:"northern"},"북방정복국가 노선 확정"),
           choice("국경 방어만 강화하고 팽창은 제한한다.",{joseon:{military:4},provinces:{"함길":{security:5},"평안":{security:4}},pathScores:{northern:2}},{}, "방어 중심"),
-          choice("외교와 교역으로 여진을 관리한다.",{joseon:{diplomacy:5,commerce:2},factions:{"여진 제부":{relation:7,tension:-5}},pathScores:{maritime:1}},{path_rejected_northern:true},"팽창 보류")
+          choice("외교와 교역으로 여진을 관리한다.",{joseon:{diplomacy:5,commerce:2},factions:{"오랑캐부":{relation:7,tension:-5}},pathScores:{maritime:1}},{path_rejected_northern:true},"팽창 보류")
         ];
       }
       out.push({weight:125+score*2,event:makeEvent(
@@ -1669,8 +2005,8 @@ function statePathEvents(s){
     out.push({weight:24,event:makeEvent("path_northern_push","북방","두만강 너머의 압박",
       "북방 무장들이 여진 내부의 분열을 이용해 영향권을 더 넓힐 기회라고 보고했다. 진격은 성과를 낼 수 있지만 보급선이 길어진다.",
       [
-        choice("군진을 한 단계 더 전진시킨다.",{joseon:{military:5,treasury:-5},provinces:{"함길":{military:4,development:2}},factions:{"여진 제부":{tension:8}}},{},"공세 확대"),
-        choice("귀부 부족을 완충세력으로 활용한다.",{joseon:{diplomacy:4,military:2},factions:{"여진 제부":{relation:5,stability:-3}}},{},"간접 지배"),
+        choice("군진을 한 단계 더 전진시킨다.",{joseon:{military:5,treasury:-5},provinces:{"함길":{military:4,development:2}},factions:{"오랑캐부":{tension:8}}},{},"공세 확대"),
+        choice("귀부 부족을 완충세력으로 활용한다.",{joseon:{diplomacy:4,military:2},factions:{"오랑캐부":{relation:5,stability:-3}}},{},"간접 지배"),
         choice("보급 부담을 이유로 현 선에서 멈춘다.",{joseon:{treasury:2,stability:2}},{},"팽창 속도 조절")
       ],["노선 전용"])});
   }
@@ -1734,18 +2070,19 @@ const STRATEGIC_DECISIONS={
     }
   },
   proclaim_empire:{
-    group:"국체·왕실",name:"칭제건원",risk:"극단적",
-    desc:"왕을 황제로 높이고 독자 연호를 선포한다. 국호를 ‘대한국’으로 바꾸거나 ‘조선’을 유지할 수 있다.",
+    group:"상시 결정",name:"칭제건원",risk:"극단적",direct:true,
+    desc:"국왕이 황제를 칭하고 독자 연호를 세운다. 조건을 갖추면 기다리지 않고 국가 결정 메뉴에서 직접 실행한다.",
     requirements:s=>[
       [s.dynasty.regime!=="republic","군주정"],
       [!s.dynasty.imperial,"아직 황제국이 아님"],
       [s.date.year>=1400,"1400년 이후"],
-      [s.joseon.national_power>=64,"국력 64 이상"],
-      [s.joseon.royal_authority>=63,"왕권 63 이상"],
-      [s.joseon.stability>=55,"안정도 55 이상"],
-      [s.joseon.military>=58,"군사력 58 이상"]
+      [s.joseon.national_power>=60,"국력 60 이상"],
+      [s.joseon.royal_authority>=60,"왕권 60 이상"],
+      [s.joseon.stability>=52,"안정도 52 이상"],
+      [s.joseon.military>=55,"군사력 55 이상"],
+      [s.joseon.treasury>=8,"재정 8 이상"]
     ],
-    turns:2,cost:6,special:"imperial"
+    turns:0,cost:8,special:"imperial_direct"
   },
   limited_monarchy:{
     group:"국체·왕실",name:"제한군주정 개혁",risk:"높음",
@@ -1771,7 +2108,7 @@ const STRATEGIC_DECISIONS={
 function decisionReqsMet(def,s){return def.requirements(s).every(([ok])=>ok)}
 function projectFor(key){return state.strategicDecisions.projects[key]||null}
 function beginStrategicDecision(key){
-  const d=STRATEGIC_DECISIONS[key];if(!d||projectFor(key)||state.strategicDecisions.completed.includes(key))return;
+  const d=STRATEGIC_DECISIONS[key];if(!d||d.direct||projectFor(key)||state.strategicDecisions.completed.includes(key))return;
   if(!decisionReqsMet(d,state)||state.joseon.treasury<d.cost)return;
   state.joseon.treasury=clamp(state.joseon.treasury-d.cost);
   state.strategicDecisions.projects[key]={progress:0,needed:d.turns,status:"active"};
@@ -1822,6 +2159,69 @@ function completeStrategicDecision(key,variant=null){
   state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"국가 결정 완료",choice:d.name,result:variant||"완료",ruler:headOfStateText(state),category:"결정"});
   recompute(state);persist();render();toast(`${d.name} 완료`);
 }
+
+function openImperialDecision(){
+  const d=STRATEGIC_DECISIONS.proclaim_empire;
+  if(!decisionReqsMet(d,state)||state.dynasty.imperial)return;
+  if(!state.strategicDecisions.imperialDraft)state.strategicDecisions.imperialDraft={open:false,stateName:"대한국",eraName:"건흥"};
+  state.strategicDecisions.imperialDraft.open=true;
+  persist();render();
+}
+function setImperialDraft(kind,value){
+  const d=state.strategicDecisions.imperialDraft||(state.strategicDecisions.imperialDraft={open:true,stateName:"대한국",eraName:"건흥"});
+  d.open=true;d[kind]=value;persist();render();
+}
+function cancelImperialDecision(){
+  if(state.strategicDecisions.imperialDraft)state.strategicDecisions.imperialDraft.open=false;
+  persist();render();
+}
+function executeImperialDecision(){
+  const def=STRATEGIC_DECISIONS.proclaim_empire,d=state.strategicDecisions.imperialDraft;
+  if(!d||!d.open||!decisionReqsMet(def,state)||state.joseon.treasury<def.cost)return;
+  state.joseon.treasury=clamp(state.joseon.treasury-def.cost);
+  state.dynasty.imperial=true;
+  state.dynasty.sovereignTitle="황제";
+  state.dynasty.stateName=d.stateName||"대한국";
+  state.dynasty.eraName=d.eraName||"건흥";
+  state.flags.era_start_year=state.date.year;
+  state.flags.conversion_decided=true;
+  state.flags.need_era=false;
+  state.flags.imperial_rites_pending=true;
+  state.joseon.royal_authority=clamp(state.joseon.royal_authority+10);
+  state.joseon.public_support=clamp(state.joseon.public_support+4);
+  state.joseon.culture=clamp(state.joseon.culture+6);
+  state.factions["명"].relation=clamp(state.factions["명"].relation-22);
+  state.factions["명"].tension=clamp(state.factions["명"].tension+27);
+  d.open=false;
+  if(!state.strategicDecisions.completed.includes("proclaim_empire"))state.strategicDecisions.completed.push("proclaim_empire");
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"국가 결정",choice:"칭제건원",result:`${state.dynasty.stateName} · ${state.dynasty.eraName} · 황제`,ruler:state.dynasty.ruler,category:"결정"});
+  state.foreign_actions.push(`${state.dynasty.ruler}이 황제를 칭하고 국호 ${state.dynasty.stateName}, 연호 ${state.dynasty.eraName}을 선포했다. 명과의 긴장이 급격히 높아졌다.`);
+  recompute(state);persist();render();toast("칭제건원을 단행했습니다.");
+}
+function imperialDecisionCard(){
+  const d=STRATEGIC_DECISIONS.proclaim_empire,done=state.dynasty.imperial||state.strategicDecisions.completed.includes("proclaim_empire");
+  const reqs=d.requirements(state),ok=reqs.every(x=>x[0]),draft=state.strategicDecisions.imperialDraft||{open:false,stateName:"대한국",eraName:"건흥"};
+  if(done)return `<div class="strategicCard imperialDecision locked"><div class="decisionTop"><h3>칭제건원</h3><span class="decisionRisk">완료</span></div><p>${state.dynasty.stateName} · ${state.dynasty.eraName} · ${state.dynasty.sovereignTitle}</p></div>`;
+  return `<div class="strategicCard imperialDecision ${!ok?"locked":""}">
+    <div class="decisionTop"><h3>👑 칭제건원</h3><span class="decisionRisk extreme">상시 결정</span></div>
+    <p>왕을 황제로 높이고 독자 연호를 선포한다. <b>랜덤 이벤트가 아니라 조건을 충족하면 여기서 바로 실행</b>한다.</p>
+    <div class="reqList">${reqs.map(([pass,label])=>`<span class="req ${pass?"ok":"no"}">${pass?"✓":"✕"} ${label}</span>`).join("")}</div>
+    ${!draft.open?`<div class="decisionActions"><button class="decisionBtn danger" data-imperial-open="1" ${!ok?"disabled":""}>칭제건원 디시전 실행</button><span class="small">비용: 재정 ${d.cost}</span></div>`:`
+      <div class="decisionSection">국호 선택</div>
+      <div class="imperialChoiceGrid">
+        <button class="imperialChoice ${draft.stateName==="대한국"?"active":""}" data-imperial-state="대한국">대한국(大韓國)</button>
+        <button class="imperialChoice ${draft.stateName==="조선"?"active":""}" data-imperial-state="조선">조선(朝鮮) 유지</button>
+      </div>
+      <div class="decisionSection">연호 선택</div>
+      <div class="eraGrid">
+        ${["건흥","광덕","무성"].map(e=>`<button class="imperialChoice ${draft.eraName===e?"active":""}" data-imperial-era="${e}">${e}</button>`).join("")}
+      </div>
+      <div class="sourceBox" style="margin-top:9px"><b>대체역사 결정</b><br>실제 조선 전기에는 이 시기의 칭제건원이 없었다. 1897년 대한제국의 칭제와 국호 변경을 역사적 참고점으로 삼은 가상 분기다.</div>
+      <div class="decisionActions"><button class="decisionBtn danger" data-imperial-execute="1">최종 재가: 황제 즉위</button><button class="decisionBtn" data-imperial-cancel="1">취소</button></div>
+    `}
+  </div>`;
+}
+
 function strategicDecisionCard(key,d){
   const p=projectFor(key),done=state.strategicDecisions.completed.includes(key),reqs=d.requirements(state),ok=reqs.every(x=>x[0]);
   const riskClass=d.risk==="극단적"?"extreme":d.risk==="높음"?"high":"";
@@ -1847,7 +2247,7 @@ function strategicDecisionsHTML(){
   const groups=[...new Set(Object.entries(STRATEGIC_DECISIONS).filter(([k])=>k!=="proclaim_empire").map(([,x])=>x.group))];
   let h=`<div class="decisionIntro">국가 결정은 랜덤 사건이 아니라 <b>직접 추진</b>합니다. 칭제건원은 상시 결정으로 항상 표시되며, 조건을 충족하면 추진할 수 있습니다.</div>
     ${fiscalPanelHTML()}
-    <div class="strategyGroup"><div class="strategyGroupTitle">상시 결정</div>${strategicDecisionCard("proclaim_empire",imperial)}</div>`;
+    <div class="strategyGroup"><div class="strategyGroupTitle">상시 결정</div>${imperialDecisionCard()}</div>`;
   for(const group of groups){
     h+=`<div class="strategyGroup"><div class="strategyGroupTitle">${group}</div>`;
     for(const [key,d] of Object.entries(STRATEGIC_DECISIONS).filter(([k,x])=>k!=="proclaim_empire"&&x.group===group)){
@@ -1862,6 +2262,11 @@ function bindStrategicDecisionButtons(root=document){
   root.querySelectorAll("[data-strategy-cancel]").forEach(b=>b.onclick=()=>cancelStrategicDecision(b.dataset.strategyCancel));
   root.querySelectorAll("[data-strategy-complete]").forEach(b=>b.onclick=()=>completeStrategicDecision(b.dataset.strategyComplete));
   root.querySelectorAll("[data-imperial-choice]").forEach(b=>b.onclick=()=>completeStrategicDecision("proclaim_empire",b.dataset.imperialChoice));
+  root.querySelectorAll("[data-imperial-open]").forEach(b=>b.onclick=openImperialDecision);
+  root.querySelectorAll("[data-imperial-state]").forEach(b=>b.onclick=()=>setImperialDraft("stateName",b.dataset.imperialState));
+  root.querySelectorAll("[data-imperial-era]").forEach(b=>b.onclick=()=>setImperialDraft("eraName",b.dataset.imperialEra));
+  root.querySelectorAll("[data-imperial-execute]").forEach(b=>b.onclick=executeImperialDecision);
+  root.querySelectorAll("[data-imperial-cancel]").forEach(b=>b.onclick=cancelImperialDecision);
 }
 
 /* ===== 국체 전환(Conversion) 이벤트 ===== */
@@ -1890,7 +2295,7 @@ function conversionEvents(s){
         choice(
           "황제로 즉위하고 국호를 ‘대한국(大韓國)’으로 바꾼다.",
           {joseon:{royal_authority:10,public_support:5,culture:8,diplomacy:-5,treasury:-6},
-           factions:{"명":{relation:-24,tension:30},"북원":{relation:5},"여진 제부":{relation:3}}},
+           factions:{"명":{relation:-24,tension:30},"북원":{relation:5},"오랑캐부":{relation:3}}},
           {conversion_decided:true,imperial_proclaimed:true,new_state_name:"대한국",new_title:"황제",need_era:true,imperial_rites_pending:true},
           "국호·군주호·연호를 모두 바꾸는 가장 큰 전환"
         ),
@@ -2018,7 +2423,7 @@ function dipOnCooldown(target,action){
 }
 function setDipCooldown(target,action,turns=3){state.diplomacyState.cooldowns[dipCooldownKey(target,action)]=state.turn+turns}
 function diplomaticAction(target,action){
-  const f=state.factions[target];if(!f)return;
+  const f=state.factions[target];if(!f||f.status==="annexed")return;
   if(dipOnCooldown(target,action))return;
   let note="";
   if(action==="improve"){
@@ -2053,21 +2458,104 @@ function diplomaticAction(target,action){
   state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"외교 행동",choice:note,result:`관계 ${Math.round(f.relation)} / 긴장 ${Math.round(f.tension)}`,ruler:headOfStateText(state),category:"외교"});
   recompute(state);persist();render();toast(note);
 }
+
+function subjectProposalChance(target,type){
+  const f=state.factions[target];if(!f||f.status!=="independent")return 0;
+  const ourPower=state.joseon.national_power*.55+state.joseon.military*.35+state.joseon.diplomacy*.10;
+  const theirPower=f.power*.75+f.stability*.20+f.aggression*.05;
+  const powerEdge=ourPower-theirPower;
+  if(type==="tributary"){
+    return Math.max(2,Math.min(92,22+f.relation*.34+powerEdge*.62+state.joseon.diplomacy*.16-f.tension*.22));
+  }
+  if(type==="subject"){
+    return Math.max(1,Math.min(82,-2+f.relation*.30+powerEdge*.78+state.joseon.diplomacy*.12-f.tension*.28));
+  }
+  if(type==="nonaggression"){
+    return Math.max(8,Math.min(95,35+f.relation*.45-state.joseon.military*.02-f.tension*.35));
+  }
+  return 0;
+}
+function makeDiplomaticProposal(target,type){
+  const f=state.factions[target];if(!f||f.status!=="independent")return;
+  const chance=subjectProposalChance(target,type);
+  const key=`proposal_${type}`;
+  if(dipOnCooldown(target,key))return;
+  if(state.joseon.diplomacy<35)return;
+  const accepted=Math.random()*100<chance;
+  let note="";
+  if(type==="tributary"){
+    if(accepted){
+      tributaryFaction(state,target);
+      state.joseon.diplomacy=clamp(state.joseon.diplomacy+3);
+      note=`${target}이 조공국화 제안을 수락했다.`;
+    }else{
+      f.relation=clamp(f.relation-4);f.tension=clamp(f.tension+3);
+      note=`${target}이 조공국화 제안을 거절했다.`;
+    }
+    setDipCooldown(target,key,6);
+  }else if(type==="subject"){
+    if(accepted){
+      subjectFaction(state,target);f.statusSince=state.turn;
+      state.joseon.royal_authority=clamp(state.joseon.royal_authority+2);
+      note=`${target}이 속국화 제안을 수락했다.`;
+    }else{
+      f.relation=clamp(f.relation-7);f.tension=clamp(f.tension+5);
+      note=`${target}이 속국화 제안을 거절했다.`;
+    }
+    setDipCooldown(target,key,8);
+  }else if(type==="nonaggression"){
+    if(accepted){
+      f.nonAggression=true;f.relation=clamp(f.relation+5);f.tension=clamp(f.tension-10);
+      note=`${target}과 불가침 약조를 맺었다.`;
+    }else{
+      note=`${target}이 불가침 약조를 거절했다.`;
+    }
+    setDipCooldown(target,key,5);
+  }
+  state.foreign_actions.push(note);
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"외교 제안",choice:note,result:`성공 가능성 ${Math.round(chance)}%`,ruler:headOfStateText(state),category:"외교"});
+  recompute(state);persist();render();toast(note);
+}
+function peacefulIntegrate(target){
+  const f=state.factions[target];if(!f||f.status!=="subject")return;
+  const age=state.turn-(f.statusSince||state.turn);
+  if(age<12||f.relation<85||state.joseon.administration<65)return;
+  const info=targetTerritoryInfo(target);
+  annexFaction(state,target,info.full,Math.round(info.fullPop*.85));
+  state.joseon.stability=clamp(state.joseon.stability-3);
+  state.joseon.administration=clamp(state.joseon.administration-2);
+  state.foreign_actions.push(`${target}과의 종속관계를 폐지하고 평화적 통합을 완료했다.`);
+  state.chronicle.push({turn:state.turn,year:state.date.year,season:state.date.season,event:"외교 통합",choice:`${target} 병합`,result:"평화적 속국 통합",ruler:headOfStateText(state),category:"외교"});
+  recompute(state);persist();render();toast(`${target} 통합 완료`);
+}
+
 function diplomacyHTML(){
-  let h=`<div class="decisionIntro">외교 행동은 <b>턴 이벤트를 기다리지 않고 직접 실행</b>할 수 있습니다. 행동별로 짧은 재사용 대기시간이 있습니다.</div>
+  let h=`<div class="decisionIntro">외교 행동은 턴 이벤트를 기다리지 않고 직접 실행합니다. 독립 세력에는 <b>조공국화·속국화·불가침 약조</b>를 제안할 수 있고, 종속국은 시간이 지나면 평화적으로 통합할 수 있습니다.</div>
   <div class="diplomacyGrid">`;
   for(const [n,f] of Object.entries(state.factions)){
+    const status=f.status||"independent";
+    const tribChance=Math.round(subjectProposalChance(n,"tributary"));
+    const subjChance=Math.round(subjectProposalChance(n,"subject"));
+    const napChance=Math.round(subjectProposalChance(n,"nonaggression"));
+    const subjectAge=state.turn-(f.statusSince||state.turn);
+    const canIntegrate=status==="subject"&&subjectAge>=12&&f.relation>=85&&state.joseon.administration>=65;
     h+=`<div class="dipCard">
-      <div class="diplomacyHeader"><div><h3>${n}</h3><div class="dipMeta">태도 ${relationText(f.relation)} · 관계 ${Math.round(f.relation)} · 긴장 ${Math.round(f.tension)}<br>세력 ${Math.round(f.power)} · 안정 ${Math.round(f.stability)}</div></div>
-      <span class="decisionRisk ${f.tension>=65?"extreme":f.tension>=45?"high":""}">${tensionText(f.tension)}</span></div>
-      <div class="relationBar"><i style="width:${Math.max(0,Math.min(100,f.relation))}%"></i></div>
+      <div class="diplomacyHeader"><div><h3>${n}${status==="annexed"?` <span class="annexBadge">병합됨</span>`:status==="subject"?` <span class="subjectBadge">속국</span>`:status==="tributary"?` <span class="subjectBadge">조공국</span>`:""}</h3>
+      <div class="dipMeta">${status==="annexed"?"조선의 직할 영토로 편입됨":`태도 ${relationText(f.relation)} · 관계 ${Math.round(f.relation)} · 긴장 ${Math.round(f.tension)}<br>세력 ${Math.round(f.power)} · 안정 ${Math.round(f.stability)}${f.region?` · ${f.region}`:""}`}</div></div>
+      <span class="decisionRisk ${f.tension>=65?"extreme":f.tension>=45?"high":""}">${status==="annexed"?"영토":status==="subject"?"종속국":status==="tributary"?"조공국":tensionText(f.tension)}</span></div>
+      ${status!=="annexed"?`<div class="relationBar"><i style="width:${Math.max(0,Math.min(100,f.relation))}%"></i></div>
       <div class="dipActions">
         <button class="dipBtn primary" data-dip="${n}|improve" ${dipOnCooldown(n,"improve")?"disabled":""}>관계 개선</button>
         <button class="dipBtn" data-dip="${n}|envoy" ${dipOnCooldown(n,"envoy")?"disabled":""}>사신 파견</button>
         <button class="dipBtn" data-dip="${n}|trade" ${dipOnCooldown(n,"trade")?"disabled":""}>통상 요구</button>
         <button class="dipBtn" data-dip="${n}|appease" ${dipOnCooldown(n,"appease")?"disabled":""}>긴장 완화</button>
-        <button class="dipBtn danger" data-dip="${n}|pressure" ${dipOnCooldown(n,"pressure")?"disabled":""}>외교 압박</button>
-      </div>
+        ${status==="independent"?`
+          <button class="dipBtn" data-proposal="${n}|nonaggression" ${dipOnCooldown(n,"proposal_nonaggression")?"disabled":""}>불가침 약조 ${napChance}%</button>
+          <button class="dipBtn primary" data-proposal="${n}|tributary" ${dipOnCooldown(n,"proposal_tributary")?"disabled":""}>조공국화 제안 ${tribChance}%</button>
+          <button class="dipBtn danger" data-proposal="${n}|subject" ${dipOnCooldown(n,"proposal_subject")?"disabled":""}>속국화 제안 ${subjChance}%</button>
+          <button class="dipBtn danger" data-dip="${n}|pressure" ${dipOnCooldown(n,"pressure")?"disabled":""}>외교 압박</button>`:""}
+        ${status==="subject"?`<button class="dipBtn danger" data-integrate="${n}" ${canIntegrate?"":"disabled"}>평화적 통합 ${canIntegrate?"가능":`(${Math.max(0,12-subjectAge)}턴)`}</button>`:""}
+      </div>`:""}
     </div>`;
   }
   h+=`</div>`;
@@ -2078,6 +2566,10 @@ function bindDiplomacyButtons(root=document){
   root.querySelectorAll("[data-dip]").forEach(b=>b.onclick=()=>{
     const [target,action]=b.dataset.dip.split("|");diplomaticAction(target,action);
   });
+  root.querySelectorAll("[data-proposal]").forEach(b=>b.onclick=()=>{
+    const [target,type]=b.dataset.proposal.split("|");makeDiplomaticProposal(target,type);
+  });
+  root.querySelectorAll("[data-integrate]").forEach(b=>b.onclick=()=>peacefulIntegrate(b.dataset.integrate));
 }
 
 /* ===== 절차적 사건 풀 ===== */
@@ -2159,12 +2651,12 @@ function procedural(s,rng){
       choice("상선에 호송 비용을 부담시키고 국가가 보호한다.",{joseon:{commerce:4,navy:2,treasury:2}},{},"상업과 해군 결합")
     ]));
 
-  addE((s.factions["여진 제부"].tension>45?35:14)+(er==="북방개척기"?12:0),makeEvent(`jurchen_${Math.floor(y/2)}`,"북방","여진 부족의 귀부와 충돌",
+  addE((s.factions["오랑캐부"].tension>45?35:14)+(er==="북방개척기"?12:0),makeEvent(`jurchen_${Math.floor(y/2)}`,"북방","여진 부족의 귀부와 충돌",
     "일부 여진 세력은 조선과의 교역과 귀부를 원하지만 다른 부족은 국경 약탈을 준비한다는 첩보가 들어왔다. 회유와 군사 압박을 함께 조절할 필요가 있다.",
     [
-      choice("귀부 세력에게 관직과 교역 특혜를 준다.",{joseon:{diplomacy:4,commerce:2},factions:{"여진 제부":{relation:8,tension:-6}},provinces:{"함길":{population:5000}}},{},"회유"),
-      choice("국경 군진을 증강하고 약탈 세력을 토벌한다.",{joseon:{treasury:-5,military:4},provinces:{"함길":{security:7,military:5}},factions:{"여진 제부":{tension:5}}},{},"군사 압박"),
-      choice("부족 간 경쟁을 이용해 세력 균형을 유지한다.",{joseon:{diplomacy:5},factions:{"여진 제부":{stability:-5,tension:-2}}},{},"균형 전략")
+      choice("귀부 세력에게 관직과 교역 특혜를 준다.",{joseon:{diplomacy:4,commerce:2},factions:{"오랑캐부":{relation:8,tension:-6}},provinces:{"함길":{population:5000}}},{},"회유"),
+      choice("국경 군진을 증강하고 약탈 세력을 토벌한다.",{joseon:{treasury:-5,military:4},provinces:{"함길":{security:7,military:5}},factions:{"오랑캐부":{tension:5}}},{},"군사 압박"),
+      choice("부족 간 경쟁을 이용해 세력 균형을 유지한다.",{joseon:{diplomacy:5},factions:{"오랑캐부":{stability:-5,tension:-2}}},{},"균형 전략")
     ]));
 
   if(y>=1418)addE((er==="문치확장기"||er==="세종문화기")?34:19,makeEvent(`science_${y%7}`,"과학","천문과 측량 기술",
@@ -2183,6 +2675,19 @@ function procedural(s,rng){
       choice("민간 서적 유통을 일부 허용한다.",{joseon:{commerce:3,technology:3,royal_authority:-1,culture:3}},{},"민간 확산")
     ]));
 
+
+  const northFactions=["오도리부","오랑캐부","우디캐 제부","모련부"].filter(n=>s.factions[n]&&s.factions[n].status!=="annexed");
+  if(northFactions.length){
+    const nf=northFactions.sort((a,b)=>s.factions[b].tension-s.factions[a].tension)[0];
+    addE(18+(s.factions[nf].tension>50?20:0),makeEvent(`jurchen_balance_${Math.floor(y/2)}`,"북방",`${nf}의 사절과 변경 요구`,
+      `${nf}의 추장들이 교역·관직·거주 문제를 놓고 조선과 직접 협상을 요구하고 있다. 북방 여진 세력은 하나의 통일국가가 아니라 여러 세력으로 나뉘어 있어 각기 다른 대응이 필요하다.`,
+      [
+        choice("관직과 교역을 허용해 조선 쪽으로 끌어들인다.",{joseon:{diplomacy:3,commerce:1},factions:{[nf]:{relation:7,tension:-5}}},{},"회유"),
+        choice("다른 여진 세력과 경쟁하도록 유도한다.",{joseon:{diplomacy:3},factions:{[nf]:{stability:-4,tension:1}}},{},"분할 견제"),
+        choice("국경 출입을 제한하고 군진을 강화한다.",{joseon:{treasury:-2,military:2},provinces:{"함길":{security:3}},factions:{[nf]:{relation:-4,tension:5}}},{},"강경 대응")
+      ],["여진 세력","북방"])
+    );
+  }
   addE(14,makeEvent(`royal_marriage_${Math.floor(y/5)}`,"왕실","왕실 혼인과 외척 문제",
     "왕실 혼인을 둘러싸고 여러 공신 가문이 경쟁하고 있다. 혼인은 정치적 안정을 줄 수 있지만 특정 외척이 지나치게 강해질 위험도 있다.",
     [
@@ -2301,18 +2806,19 @@ function nextEvent(s){
   const succPriority=succ.filter(x=>x.weight>=180);
   if(succPriority.length)return weightedPick(rng,succPriority);
 
+  const h=historical(s).filter(x=>!["hist_capital","hist_hanyang"].includes(x.event.id));
+  const historicalPriority=h.filter(x=>x.weight>=180);
+  if(historicalPriority.length && rng()<.88)return weightedPick(rng,historicalPriority);
+  if(h.length && rng()<.68)return weightedPick(rng,h);
+
   const chains=chainEvents(s);
   if(chains.length)return weightedPick(rng,chains);
 
   const paths=statePathEvents(s);
   const pathPriority=paths.filter(x=>x.weight>=145);
-  if(pathPriority.length)return weightedPick(rng,pathPriority);
+  if(pathPriority.length&&rng()<.65)return weightedPick(rng,pathPriority);
 
-  const h=historical(s);
-  const priority=h.filter(x=>x.weight>=150 && !["hist_capital","hist_hanyang"].includes(x.event.id));
-  if(priority.length)return weightedPick(rng,priority);
-
-  return weightedPick(rng,h.filter(x=>!["hist_capital","hist_hanyang"].includes(x.event.id)).concat(reb).concat(succ).concat(paths).concat(procedural(s,rng)));
+  return weightedPick(rng,h.concat(reb).concat(succ).concat(paths).concat(procedural(s,rng)));
 }
 
 function updateChains(s,ev,ch){
@@ -2386,6 +2892,13 @@ function recurringFiscalBonus(s){
   if(s.flags.steppe_trade){b+=.40;labels.push("초원 교역 +0.40")}
   if(s.flags.jurchen_tribute){b+=.35;labels.push("여진 귀부교역 +0.35")}
   if(s.dynasty.statePath==="maritime"){b+=.25*(s.dynasty.statePathLevel||1);labels.push(`해양통상국가 +${(.25*(s.dynasty.statePathLevel||1)).toFixed(2)}`)}
+  for(const [name,f] of Object.entries(s.factions||{})){
+    if(f.status==="tributary"){
+      const v=Math.min(.9,.18+(f.power||0)*.010);b+=v;labels.push(`${name} 조공 +${v.toFixed(2)}`);
+    }else if(f.status==="subject"){
+      const v=Math.min(1.1,.28+(f.power||0)*.011);b+=v;labels.push(`${name} 속국납부 +${v.toFixed(2)}`);
+    }
+  }
   return {value:b,labels};
 }
 function calculateSeasonalRevenue(s){
@@ -2465,6 +2978,7 @@ function simulateDomestic(s,rng){
 function simulateForeign(s,rng){
   const notes=[];
   for(const f of Object.values(s.factions)){
+    if(f.status==="annexed")continue;
     f.stability=clamp(f.stability+(rng()-.5)*4);
     f.power=clamp(f.power+(rng()-.5)*2.4);
     f.tension=clamp(f.tension+(rng()-.5)*4.5);
@@ -2474,20 +2988,20 @@ function simulateForeign(s,rng){
     if(s.factions["명"].power>s.factions["북원"].power){
       notes.push("명군의 북방 압박이 강해지며 북원 세력이 동쪽으로 이동하고 있다는 보고가 들어왔다.");
       s.factions["북원"].stability=clamp(s.factions["북원"].stability-4);
-      s.factions["여진 제부"].tension=clamp(s.factions["여진 제부"].tension+3);
+      s.factions["오랑캐부"].tension=clamp(s.factions["오랑캐부"].tension+3);
     }else{
       notes.push("북원 세력이 초원에서 세력을 회복하면서 명의 요동 방어가 바빠졌다는 정보가 들어왔다.");
       s.factions["명"].tension=clamp(s.factions["명"].tension+3);
     }
   }
-  if(rng()<.10){
+  if(rng()<.10 && s.factions["대마도 소씨"].status!=="annexed"){
     notes.push("일본 서부 해역의 정세가 흔들리며 대마도와 왜구 세력의 움직임이 거칠어졌다.");
     s.factions["대마도 소씨"].tension=clamp(s.factions["대마도 소씨"].tension+5);
     s.provinces["경상"].security=clamp(s.provinces["경상"].security-2);
   }
-  if(rng()<.09){
+  if(rng()<.09 && s.factions["오랑캐부"].status!=="annexed"){
     notes.push("여진 부족 사이의 동맹과 충돌이 반복되면서 함길도 국경의 정세가 빠르게 변하고 있다.");
-    s.factions["여진 제부"].stability=clamp(s.factions["여진 제부"].stability+(rng()-.5)*8);
+    s.factions["오랑캐부"].stability=clamp(s.factions["오랑캐부"].stability+(rng()-.5)*8);
     s.provinces["함길"].security=clamp(s.provinces["함길"].security-1);
   }
   if(rng()<.06){
@@ -2651,16 +3165,17 @@ function render(){
   }
   renderSide();renderMobileSections();renderInternal();renderStrategicDecisions();renderMilitary();renderWarHud();
 }
-function persist(){localStorage.setItem("joseon1393_v10",JSON.stringify(state))}
+function persist(){localStorage.setItem("joseon1393_v12",JSON.stringify(state))}
 function saveFile(){
   const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);a.download=`joseon_v10_${state.date.year}_${state.date.season}.json`;a.click();URL.revokeObjectURL(a.href);
+  a.href=URL.createObjectURL(blob);a.download=`joseon_v12_${state.date.year}_${state.date.season}.json`;a.click();URL.revokeObjectURL(a.href);
 }
 function migrate(s){
   if(!s)return null;
-  if(![5,6,7,8,9,10].includes(s.version))return null;
-  s.version=10;
+  if(![5,6,7,8,9,10,11,12].includes(s.version))return null;
+  s.version=12;
   if(!s.pathScores)s.pathScores={council:0,royal:0,maritime:0,northern:0};
+  if(typeof s.joseon.external_population!=="number")s.joseon.external_population=0;
   if(!s.war)s.war={active:false,target:"",planKey:"",goal:"",type:"",score:0,exhaustion:0,readiness:55,turns:0,stance:"balanced",actionUsedTurn:-1,prep:null,lastReport:"",history:[],peaceMode:"",peaceSelected:[],enemySurrender:false,enemyDemands:false,stalemate:false};
   if(typeof s.war.readiness!=="number")s.war.readiness=55;
   if(!Array.isArray(s.war.history))s.war.history=[];
@@ -2673,19 +3188,46 @@ function migrate(s){
   if(!s.dynasty.regime)s.dynasty.regime="monarchy";
   if(!s.dynasty.governmentName)s.dynasty.governmentName=s.dynasty.regime==="republic"?"의정공화정":"왕정";
   if(typeof s.dynasty.successionCount!=="number")s.dynasty.successionCount=0;
+
+  // Migrate generic old Jurchen faction into historically separated northern groups.
+  const oldJ=s.factions?.["여진 제부"];
+  if(oldJ){
+    if(!s.factions["오도리부"])s.factions["오도리부"]={power:Math.max(18,oldJ.power*.58),relation:Math.max(48,oldJ.relation+15),tension:Math.max(10,oldJ.tension-20),stability:Math.max(42,oldJ.stability+10),aggression:24,status:"independent",culture:"여진",region:"두만강 중류·오음회"};
+    if(!s.factions["오랑캐부"])s.factions["오랑캐부"]={power:Math.max(25,oldJ.power*.82),relation:Math.min(35,oldJ.relation),tension:Math.max(38,oldJ.tension+4),stability:Math.max(35,oldJ.stability),aggression:54,status:oldJ.status||"independent",culture:"여진",region:"압록강·파저강 및 건주 방면"};
+    if(!s.factions["우디캐 제부"])s.factions["우디캐 제부"]={power:Math.max(23,oldJ.power*.72),relation:Math.min(28,oldJ.relation-5),tension:Math.max(42,oldJ.tension+8),stability:Math.max(30,oldJ.stability-2),aggression:59,status:"independent",culture:"여진",region:"만주 내지·두만강 북방"};
+    if(!s.factions["모련부"])s.factions["모련부"]={power:Math.max(15,oldJ.power*.45),relation:Math.min(38,oldJ.relation),tension:Math.max(34,oldJ.tension),stability:Math.max(34,oldJ.stability),aggression:47,status:"independent",culture:"여진",region:"두만강 중류·해란강"};
+    delete s.factions["여진 제부"];
+  }
+  const defaults={
+    "오도리부":{power:24,relation:58,tension:18,stability:56,aggression:22,status:"independent",culture:"여진",region:"두만강 중류·오음회"},
+    "오랑캐부":{power:34,relation:25,tension:49,stability:44,aggression:54,status:"independent",culture:"여진",region:"압록강·파저강 및 건주 방면"},
+    "우디캐 제부":{power:30,relation:20,tension:53,stability:37,aggression:59,status:"independent",culture:"여진",region:"만주 내지·두만강 북방"},
+    "모련부":{power:19,relation:31,tension:41,stability:42,aggression:47,status:"independent",culture:"여진",region:"두만강 중류·해란강"}
+  };
+  for(const [k,v] of Object.entries(defaults))if(!s.factions[k])s.factions[k]=v;
+  for(const f of Object.values(s.factions||{}))if(!f.status)f.status="independent";
+  if(s.war.target==="여진 제부"){s.war.target="오랑캐부";s.war.planKey="orangke";}
+  if(s.war.prep?.target==="여진 제부"){s.war.prep.target="오랑캐부";s.war.prep.key="orangke";}
+
   if(!s.diplomacyState)s.diplomacyState={cooldowns:{},lastAction:"",lastActionTurn:-1};
   if(!s.diplomacyState.cooldowns)s.diplomacyState.cooldowns={};
   if(!s.fiscal)s.fiscal={taxPolicy:"normal",lastRevenue:0,lastBaseRevenue:0,lastBonusRevenue:0,lastExpense:0,history:[]};
   if(!s.fiscal.taxPolicy)s.fiscal.taxPolicy="normal";
   if(!Array.isArray(s.fiscal.history))s.fiscal.history=[];
-  if(!s.strategicDecisions)s.strategicDecisions={projects:{},completed:[]};
+  if(!s.strategicDecisions)s.strategicDecisions={projects:{},completed:[],imperialDraft:{open:false,stateName:"대한국",eraName:"건흥"}};
   if(!s.strategicDecisions.projects)s.strategicDecisions.projects={};
   if(!Array.isArray(s.strategicDecisions.completed))s.strategicDecisions.completed=[];
+  if(!s.strategicDecisions.imperialDraft)s.strategicDecisions.imperialDraft={open:false,stateName:"대한국",eraName:"건흥"};
+  if(s.strategicDecisions.projects.proclaim_empire){
+    delete s.strategicDecisions.projects.proclaim_empire;
+    s.strategicDecisions.imperialDraft.open=false;
+  }
+  if(!Array.isArray(s.territorialHoldings))s.territorialHoldings=[];
   return s;
 }
 function loadFile(file){
   const r=new FileReader();
-  r.onload=()=>{try{const x=migrate(JSON.parse(r.result));if(!x)throw Error();state=x;if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);persist();render();toast("저장 파일을 불러왔습니다.")}catch(e){console.error(e);toast("V5~V10 저장 파일이 아닙니다.")}};
+  r.onload=()=>{try{const x=migrate(JSON.parse(r.result));if(!x)throw Error();state=x;if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);persist();render();toast("저장 파일을 불러왔습니다.")}catch(e){console.error(e);toast("V5~V12 저장 파일이 아닙니다.")}};
   r.readAsText(file);
 }
 
@@ -2705,13 +3247,15 @@ document.querySelector("#loadInput").onchange=e=>{if(e.target.files[0])loadFile(
 
 let state;
 try{
+  const v12=localStorage.getItem("joseon1393_v12");
+  const v11=localStorage.getItem("joseon1393_v11");
   const v10=localStorage.getItem("joseon1393_v10");
   const v9=localStorage.getItem("joseon1393_v9");
   const v8=localStorage.getItem("joseon1393_v8");
   const v7=localStorage.getItem("joseon1393_v7");
   const v6=localStorage.getItem("joseon1393_v6");
   const v5=localStorage.getItem("joseon1393_v5");
-  state=migrate(JSON.parse(v10||v9||v8||v7||v6||v5))||newGame();
+  state=migrate(JSON.parse(v12||v11||v10||v9||v8||v7||v6||v5))||newGame();
 }catch{state=newGame()}
 if(!state.current_event&&!state.game_over)state.current_event=nextEvent(state);
 recompute(state);render();
